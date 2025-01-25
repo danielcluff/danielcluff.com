@@ -11,7 +11,6 @@ interface Props {
 const { href, linkText, title, imageUrl, imageAlt, skills } = Astro.props;
 ---
 
-<!-- <li class="work-card"> -->
 <section class="grid">
 	<img src={imageUrl} alt={imageAlt} />
 	<div>
@@ -29,30 +28,8 @@ const { href, linkText, title, imageUrl, imageAlt, skills } = Astro.props;
 		</p>
 	</div>
 </section>
-<!-- </li> -->
+
 <style>
-	.work-card {
-		list-style: none;
-		display: flex;
-		padding: 1px;
-		background-color: #23262d;
-		background-image: none;
-		background-size: 400%;
-		border-radius: 7px;
-		background-position: 100%;
-		transition: background-position 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-	}
-	.work-card > a {
-		width: 100%;
-		text-decoration: none;
-		line-height: 1.4;
-		padding: calc(1.5rem - 1px);
-		border-radius: 8px;
-		color: white;
-		background-color: #23262d;
-		opacity: 0.8;
-	}
 	h3 {
 		margin: 0;
 		transition: color 0.6s cubic-bezier(0.22, 1, 0.36, 1);
@@ -66,7 +43,7 @@ const { href, linkText, title, imageUrl, imageAlt, skills } = Astro.props;
 		border-radius: 4px;
 	}
 	.grid {
-		margin-bottom: 2rem;
+		margin-bottom: 3rem;
 		@media (min-width: 768px) {
 			grid-column-gap: 1rem;
 			grid-template-columns: 33% auto;
