@@ -1,0 +1,288 @@
+---
+import Layout from "../layouts/Layout.astro";
+const title = "BitTimer - Interval Timer";
+---
+
+<Layout title={title}>
+    <div id="app" class="h-full max-w-md mx-auto bg-white shadow-lg flex flex-col">
+        <!-- Header -->
+        <div class="bg-blue-600 text-white p-4 text-center shadow-md">
+            <h1 class="text-xl font-bold">BitTimer</h1>
+        </div>
+
+        <!-- Timer Display -->
+        <div class="flex-1 flex flex-col justify-center items-center p-6">
+            <div class="text-center mb-8">
+                <div id="timer-display" class="text-6xl font-mono font-bold text-gray-800 mb-2">
+                    00:00
+                </div>
+                <div id="phase-display" class="text-lg text-gray-600 mb-2">Ready to Start</div>
+                <div id="round-display" class="text-sm text-gray-500">Round 0 of 0</div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full max-w-xs mb-8">
+                <div class="bg-gray-200 rounded-full h-2">
+                    <div
+                        id="progress-bar"
+                        class="bg-blue-600 h-2 rounded-full transition-all duration-1000"
+                        style="width: 0%"
+                    >
+                    </div>
+                </div>
+            </div>
+
+            <!-- Control Buttons -->
+            <div class="flex space-x-4 mb-8">
+                <button
+                    id="start-btn"
+                    class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md transition-colors"
+                >
+                    Start
+                </button>
+                <button
+                    id="pause-btn"
+                    class="bg-yellow-600 hover:bg-yellow-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md transition-colors hidden"
+                >
+                    Pause
+                </button>
+                <button
+                    id="reset-btn"
+                    class="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md transition-colors"
+                >
+                    Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Settings Panel -->
+        <div class="bg-gray-50 p-4 border-t">
+            <h2 class="text-lg font-semibold mb-4 text-gray-800">Timer Settings</h2>
+
+            <div class="space-y-4">
+                <div>
+                    <label for="work-time" class="block text-sm font-medium text-gray-700 mb-1">
+                        Work Time (seconds)
+                    </label>
+                    <input
+                        type="number"
+                        id="work-time"
+                        min="1"
+                        max="3600"
+                        value="30"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+
+                <div>
+                    <label for="rest-time" class="block text-sm font-medium text-gray-700 mb-1">
+                        Rest Time (seconds)
+                    </label>
+                    <input
+                        type="number"
+                        id="rest-time"
+                        min="1"
+                        max="3600"
+                        value="5"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+
+                <div>
+                    <label for="rounds" class="block text-sm font-medium text-gray-700 mb-1">
+                        Number of Rounds
+                    </label>
+                    <input
+                        type="number"
+                        id="rounds"
+                        min="1"
+                        max="50"
+                        value="12"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class BitTimer {
+            constructor() {
+                this.workTime = 30;
+                this.restTime = 5;
+                this.totalRounds = 12;
+                this.currentRound = 0;
+                this.currentTime = 0;
+                this.isRunning = false;
+                this.isPaused = false;
+                this.isWorkPhase = true;
+                this.intervalId = null;
+                this.totalTime = 0;
+                this.elapsedTime = 0;
+
+                this.initElements();
+                this.bindEvents();
+                this.updateDisplay();
+            }
+
+            initElements() {
+                this.timerDisplay = document.getElementById("timer-display");
+                this.phaseDisplay = document.getElementById("phase-display");
+                this.roundDisplay = document.getElementById("round-display");
+                this.progressBar = document.getElementById("progress-bar");
+                this.startBtn = document.getElementById("start-btn");
+                this.pauseBtn = document.getElementById("pause-btn");
+                this.resetBtn = document.getElementById("reset-btn");
+                this.workTimeInput = document.getElementById("work-time");
+                this.restTimeInput = document.getElementById("rest-time");
+                this.roundsInput = document.getElementById("rounds");
+            }
+
+            bindEvents() {
+                this.startBtn.addEventListener("click", () => this.start());
+                this.pauseBtn.addEventListener("click", () => this.pause());
+                this.resetBtn.addEventListener("click", () => this.reset());
+
+                this.workTimeInput.addEventListener("input", () => this.updateSettings());
+                this.restTimeInput.addEventListener("input", () => this.updateSettings());
+                this.roundsInput.addEventListener("input", () => this.updateSettings());
+            }
+
+            updateSettings() {
+                if (!this.isRunning) {
+                    this.workTime = parseInt(this.workTimeInput.value) || 25;
+                    this.restTime = parseInt(this.restTimeInput.value) || 5;
+                    this.totalRounds = parseInt(this.roundsInput.value) || 8;
+                    this.updateDisplay();
+                }
+            }
+
+            start() {
+                if (!this.isRunning && !this.isPaused) {
+                    this.currentRound = 1;
+                    this.isWorkPhase = true;
+                    this.currentTime = this.workTime;
+                    this.calculateTotalTime();
+                }
+
+                this.isRunning = true;
+                this.isPaused = false;
+
+                this.startBtn.classList.add("hidden");
+                this.pauseBtn.classList.remove("hidden");
+
+                this.intervalId = setInterval(() => this.tick(), 1000);
+                this.updateDisplay();
+            }
+
+            pause() {
+                this.isRunning = false;
+                this.isPaused = true;
+
+                clearInterval(this.intervalId);
+
+                this.startBtn.classList.remove("hidden");
+                this.pauseBtn.classList.add("hidden");
+                this.startBtn.textContent = "Resume";
+            }
+
+            reset() {
+                this.isRunning = false;
+                this.isPaused = false;
+                this.currentRound = 0;
+                this.isWorkPhase = true;
+                this.currentTime = 0;
+                this.elapsedTime = 0;
+
+                clearInterval(this.intervalId);
+
+                this.startBtn.classList.remove("hidden");
+                this.pauseBtn.classList.add("hidden");
+                this.startBtn.textContent = "Start";
+
+                this.updateDisplay();
+            }
+
+            tick() {
+                this.currentTime--;
+                this.elapsedTime++;
+
+                if (this.currentTime <= 0) {
+                    if (this.isWorkPhase) {
+                        // Work phase complete, switch to rest
+                        if (this.currentRound < this.totalRounds) {
+                            this.isWorkPhase = false;
+                            this.currentTime = this.restTime;
+                        } else {
+                            // All rounds complete
+                            this.complete();
+                            return;
+                        }
+                    } else {
+                        // Rest phase complete, switch to next work round
+                        this.currentRound++;
+                        this.isWorkPhase = true;
+                        this.currentTime = this.workTime;
+                    }
+                }
+
+                this.updateDisplay();
+            }
+
+            complete() {
+                this.isRunning = false;
+                clearInterval(this.intervalId);
+
+                this.phaseDisplay.textContent = "Complete! 🎉";
+                this.startBtn.classList.remove("hidden");
+                this.pauseBtn.classList.add("hidden");
+                this.startBtn.textContent = "Start";
+
+                // Flash the screen or play a sound (basic visual feedback)
+                document.body.style.backgroundColor = "#10B981";
+                setTimeout(() => {
+                    document.body.style.backgroundColor = "";
+                }, 500);
+            }
+
+            calculateTotalTime() {
+                this.totalTime = (this.workTime + this.restTime) * this.totalRounds - this.restTime;
+                this.elapsedTime = 0;
+            }
+
+            updateDisplay() {
+                // Update timer display
+                const minutes = Math.floor(this.currentTime / 60);
+                const seconds = this.currentTime % 60;
+                this.timerDisplay.textContent = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+
+                // Update phase display
+                if (this.currentRound === 0) {
+                    this.phaseDisplay.textContent = "Ready to Start";
+                } else if (this.isWorkPhase) {
+                    this.phaseDisplay.textContent = "Work Time 💪";
+                    this.timerDisplay.style.color = "#DC2626";
+                } else {
+                    this.phaseDisplay.textContent = "Rest Time 😴";
+                    this.timerDisplay.style.color = "#059669";
+                }
+
+                // Update round display
+                this.roundDisplay.textContent = `Round ${this.currentRound} of ${this.totalRounds}`;
+
+                // Update progress bar
+                if (this.totalTime > 0) {
+                    const progress = (this.elapsedTime / this.totalTime) * 100;
+                    this.progressBar.style.width = `${Math.min(progress, 100)}%`;
+                } else {
+                    this.progressBar.style.width = "0%";
+                }
+            }
+        }
+
+        // Initialize the timer when the page loads
+        document.addEventListener("DOMContentLoaded", () => {
+            new BitTimer();
+        });
+    </script>
+</Layout>
