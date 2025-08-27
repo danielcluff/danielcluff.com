@@ -1,16 +1,18 @@
 {
-  "name": "zany-zero",
-  "type": "module",
-  "version": "0.0.1",
-  "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
-  },
-  "dependencies": {
-    "@picocss/pico": "^1.5.10",
-    "astro": "^3.2.0"
-  }
+    "name": "zany-zero",
+    "type": "module",
+    "version": "0.0.2",
+    "scripts": {
+        "dev": "astro dev",
+        "start": "astro dev",
+        "build": "astro build",
+        "preview": "astro preview",
+        "astro": "astro"
+    },
+    "dependencies": {
+        "@picocss/pico": "^1.5.10",
+        "@tailwindcss/vite": "^4.1.12",
+        "astro": "^5.13.4",
+        "tailwindcss": "^4.1.12"
+    }
 }

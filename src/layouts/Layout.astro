@@ -1,49 +1,49 @@
 ---
 interface Props {
-	title: string;
+    title: string;
 }
-
+import "../style.css";
 const { title } = Astro.props;
 ---
 
 <!doctype html>
 <html lang="en" data-theme="dark">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="description" content="Astro description" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-	</head>
-	<body>
-		<slot />
-	</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="description" content="Astro description" />
+        <meta name="viewport" content="width=device-width" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="generator" content={Astro.generator} />
+        <title>{title}</title>
+    </head>
+    <body>
+        <slot />
+    </body>
 </html>
 <style is:global>
-	html {
-		font-family: system-ui, sans-serif;
-	}
-	.accent {
-		color: rgb(197, 216, 109);
-	}
-	a.accent:hover {
-		color: rgb(220, 241, 127);
-	}
-	.social {
-		height: 24px;
-		width: 24px;
-		margin-right: 0.5rem;
-	}
-	code {
-		font-family:
-			Menlo,
-			Monaco,
-			Lucida Console,
-			Liberation Mono,
-			DejaVu Sans Mono,
-			Bitstream Vera Sans Mono,
-			Courier New,
-			monospace;
-	}
+    html {
+        font-family: system-ui, sans-serif;
+    }
+    .accent {
+        color: rgb(197, 216, 109);
+    }
+    a.accent:hover {
+        color: rgb(220, 241, 127);
+    }
+    .social {
+        height: 24px;
+        width: 24px;
+        margin-right: 0.5rem;
+    }
+    code {
+        font-family:
+            Menlo,
+            Monaco,
+            Lucida Console,
+            Liberation Mono,
+            DejaVu Sans Mono,
+            Bitstream Vera Sans Mono,
+            Courier New,
+            monospace;
+    }
 </style>
