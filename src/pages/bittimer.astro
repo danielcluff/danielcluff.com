@@ -121,22 +121,35 @@ const title = "BitTimer - Interval Timer";
                 this.intervalId = null;
                 this.totalTime = 0;
                 this.elapsedTime = 0;
+                this.wakeLock = null;
 
                 this.initAudio();
                 this.initElements();
                 this.bindEvents();
+                this.handleVisibilityChange();
                 this.updateDisplay();
             }
 
             initAudio() {
                 this.audioContext = null;
                 this.sounds = {};
+                this.audioInitialized = false;
                 
                 // Initialize audio context on first user interaction
                 const initAudioContext = () => {
                     if (!this.audioContext) {
                         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                        this.createSounds();
+                        
+                        // Resume audio context if it's suspended (required for iOS)
+                        if (this.audioContext.state === 'suspended') {
+                            this.audioContext.resume().then(() => {
+                                this.createSounds();
+                                this.audioInitialized = true;
+                            });
+                        } else {
+                            this.createSounds();
+                            this.audioInitialized = true;
+                        }
                     }
                 };
 
@@ -207,9 +220,56 @@ const title = "BitTimer - Interval Timer";
             }
 
             playSound(soundName) {
-                if (this.sounds[soundName]) {
+                if (!this.audioInitialized || !this.sounds[soundName]) {
+                    return;
+                }
+                
+                // Ensure audio context is running on iOS
+                if (this.audioContext && this.audioContext.state === 'suspended') {
+                    this.audioContext.resume().then(() => {
+                        this.sounds[soundName]();
+                    });
+                } else {
                     this.sounds[soundName]();
                 }
+            }
+
+            async requestWakeLock() {
+                try {
+                    // Check if Wake Lock API is supported
+                    if ('wakeLock' in navigator) {
+                        // Request a screen wake lock
+                        this.wakeLock = await navigator.wakeLock.request('screen');
+                        
+                        // Listen for wake lock release (e.g., when tab becomes inactive)
+                        this.wakeLock.addEventListener('release', () => {
+                            console.log('Wake lock released');
+                        });
+                        
+                        console.log('Wake lock activated');
+                    } else {
+                        console.log('Wake Lock API not supported');
+                    }
+                } catch (err) {
+                    console.error('Failed to request wake lock:', err);
+                }
+            }
+
+            releaseWakeLock() {
+                if (this.wakeLock) {
+                    this.wakeLock.release();
+                    this.wakeLock = null;
+                    console.log('Wake lock released manually');
+                }
+            }
+
+            handleVisibilityChange() {
+                // Re-request wake lock when page becomes visible again (if timer is running)
+                document.addEventListener('visibilitychange', async () => {
+                    if (!document.hidden && this.isRunning) {
+                        await this.requestWakeLock();
+                    }
+                });
             }
 
             initElements() {
@@ -244,7 +304,27 @@ const title = "BitTimer - Interval Timer";
                 }
             }
 
-            start() {
+            async start() {
+                // Ensure audio is initialized on start (most reliable user interaction)
+                if (!this.audioContext) {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                
+                if (this.audioContext.state === 'suspended') {
+                    this.audioContext.resume().then(() => {
+                        if (!this.audioInitialized) {
+                            this.createSounds();
+                            this.audioInitialized = true;
+                        }
+                    });
+                } else if (!this.audioInitialized) {
+                    this.createSounds();
+                    this.audioInitialized = true;
+                }
+
+                // Request wake lock to prevent device from sleeping
+                await this.requestWakeLock();
+
                 if (!this.isRunning && !this.isPaused) {
                     // Start with warmup phase
                     this.currentRound = 0;
@@ -270,6 +350,9 @@ const title = "BitTimer - Interval Timer";
 
                 clearInterval(this.intervalId);
 
+                // Release wake lock when paused
+                this.releaseWakeLock();
+
                 this.startBtn.classList.remove("hidden");
                 this.pauseBtn.classList.add("hidden");
                 this.startBtn.textContent = "Resume";
@@ -285,6 +368,9 @@ const title = "BitTimer - Interval Timer";
                 this.elapsedTime = 0;
 
                 clearInterval(this.intervalId);
+
+                // Release wake lock when reset
+                this.releaseWakeLock();
 
                 this.startBtn.classList.remove("hidden");
                 this.pauseBtn.classList.add("hidden");
@@ -341,6 +427,9 @@ const title = "BitTimer - Interval Timer";
             complete() {
                 this.isRunning = false;
                 clearInterval(this.intervalId);
+
+                // Release wake lock when complete
+                this.releaseWakeLock();
 
                 // Play completion fanfare
                 this.playSound('completion');
