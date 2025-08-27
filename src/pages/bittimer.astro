@@ -111,18 +111,105 @@ const title = "BitTimer - Interval Timer";
                 this.workTime = 30;
                 this.restTime = 5;
                 this.totalRounds = 12;
+                this.warmupTime = 10;
                 this.currentRound = 0;
                 this.currentTime = 0;
                 this.isRunning = false;
                 this.isPaused = false;
                 this.isWorkPhase = true;
+                this.isWarmupPhase = false;
                 this.intervalId = null;
                 this.totalTime = 0;
                 this.elapsedTime = 0;
 
+                this.initAudio();
                 this.initElements();
                 this.bindEvents();
                 this.updateDisplay();
+            }
+
+            initAudio() {
+                this.audioContext = null;
+                this.sounds = {};
+                
+                // Initialize audio context on first user interaction
+                const initAudioContext = () => {
+                    if (!this.audioContext) {
+                        this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        this.createSounds();
+                    }
+                };
+
+                // Add event listeners for user interaction to enable audio
+                document.addEventListener('click', initAudioContext, { once: false });
+                document.addEventListener('touchstart', initAudioContext, { once: false });
+            }
+
+            createSounds() {
+                // Work end sound (bell-like)
+                this.sounds.workEnd = this.createSound(800, 0.3, 'sine');
+                
+                // Rest countdown chime (short beep)
+                this.sounds.restCountdown = this.createSound(1000, 0.15, 'triangle');
+                
+                // Completion fanfare (ascending notes)
+                this.sounds.completion = this.createCompletionSound();
+            }
+
+            createSound(frequency, duration, waveform = 'sine') {
+                return () => {
+                    if (!this.audioContext) return;
+                    
+                    const oscillator = this.audioContext.createOscillator();
+                    const gainNode = this.audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(this.audioContext.destination);
+                    
+                    oscillator.frequency.value = frequency;
+                    oscillator.type = waveform;
+                    
+                    gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+                    
+                    oscillator.start(this.audioContext.currentTime);
+                    oscillator.stop(this.audioContext.currentTime + duration);
+                };
+            }
+
+            createCompletionSound() {
+                return () => {
+                    if (!this.audioContext) return;
+                    
+                    const frequencies = [523, 659, 784, 1047]; // C, E, G, C (one octave higher)
+                    const noteDuration = 0.2;
+                    
+                    frequencies.forEach((freq, index) => {
+                        const oscillator = this.audioContext.createOscillator();
+                        const gainNode = this.audioContext.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(this.audioContext.destination);
+                        
+                        oscillator.frequency.value = freq;
+                        oscillator.type = 'triangle';
+                        
+                        const startTime = this.audioContext.currentTime + (index * noteDuration);
+                        const endTime = startTime + noteDuration;
+                        
+                        gainNode.gain.setValueAtTime(0.2, startTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, endTime);
+                        
+                        oscillator.start(startTime);
+                        oscillator.stop(endTime);
+                    });
+                };
+            }
+
+            playSound(soundName) {
+                if (this.sounds[soundName]) {
+                    this.sounds[soundName]();
+                }
             }
 
             initElements() {
@@ -159,9 +246,11 @@ const title = "BitTimer - Interval Timer";
 
             start() {
                 if (!this.isRunning && !this.isPaused) {
-                    this.currentRound = 1;
-                    this.isWorkPhase = true;
-                    this.currentTime = this.workTime;
+                    // Start with warmup phase
+                    this.currentRound = 0;
+                    this.isWarmupPhase = true;
+                    this.isWorkPhase = false;
+                    this.currentTime = this.warmupTime;
                     this.calculateTotalTime();
                 }
 
@@ -191,6 +280,7 @@ const title = "BitTimer - Interval Timer";
                 this.isPaused = false;
                 this.currentRound = 0;
                 this.isWorkPhase = true;
+                this.isWarmupPhase = false;
                 this.currentTime = 0;
                 this.elapsedTime = 0;
 
@@ -207,9 +297,28 @@ const title = "BitTimer - Interval Timer";
                 this.currentTime--;
                 this.elapsedTime++;
 
+                // Play countdown chime during warmup phase when 3 seconds or less remain
+                if (this.isWarmupPhase && this.currentTime <= 3 && this.currentTime > 0) {
+                    this.playSound('restCountdown');
+                }
+
+                // Play countdown chime during rest phase when 3 seconds or less remain
+                if (!this.isWorkPhase && !this.isWarmupPhase && this.currentTime <= 3 && this.currentTime > 0) {
+                    this.playSound('restCountdown');
+                }
+
                 if (this.currentTime <= 0) {
-                    if (this.isWorkPhase) {
-                        // Work phase complete, switch to rest
+                    if (this.isWarmupPhase) {
+                        // Warmup complete, start first work round
+                        this.isWarmupPhase = false;
+                        this.isWorkPhase = true;
+                        this.currentRound = 1;
+                        this.currentTime = this.workTime;
+                    } else if (this.isWorkPhase) {
+                        // Work phase complete, play work end sound
+                        this.playSound('workEnd');
+                        
+                        // Switch to rest phase
                         if (this.currentRound < this.totalRounds) {
                             this.isWorkPhase = false;
                             this.currentTime = this.restTime;
@@ -233,12 +342,15 @@ const title = "BitTimer - Interval Timer";
                 this.isRunning = false;
                 clearInterval(this.intervalId);
 
+                // Play completion fanfare
+                this.playSound('completion');
+
                 this.phaseDisplay.textContent = "Complete! 🎉";
                 this.startBtn.classList.remove("hidden");
                 this.pauseBtn.classList.add("hidden");
                 this.startBtn.textContent = "Start";
 
-                // Flash the screen or play a sound (basic visual feedback)
+                // Flash the screen with enhanced visual feedback
                 document.body.style.backgroundColor = "#10B981";
                 setTimeout(() => {
                     document.body.style.backgroundColor = "";
@@ -246,7 +358,8 @@ const title = "BitTimer - Interval Timer";
             }
 
             calculateTotalTime() {
-                this.totalTime = (this.workTime + this.restTime) * this.totalRounds - this.restTime;
+                // Include warmup time in total calculation
+                this.totalTime = this.warmupTime + (this.workTime + this.restTime) * this.totalRounds - this.restTime;
                 this.elapsedTime = 0;
             }
 
@@ -257,8 +370,12 @@ const title = "BitTimer - Interval Timer";
                 this.timerDisplay.textContent = `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 
                 // Update phase display
-                if (this.currentRound === 0) {
+                if (this.currentRound === 0 && !this.isWarmupPhase && !this.isRunning) {
                     this.phaseDisplay.textContent = "Ready to Start";
+                    this.timerDisplay.style.color = "#374151";
+                } else if (this.isWarmupPhase) {
+                    this.phaseDisplay.textContent = "Get Ready! 🚀";
+                    this.timerDisplay.style.color = "#F59E0B";
                 } else if (this.isWorkPhase) {
                     this.phaseDisplay.textContent = "Work Time 💪";
                     this.timerDisplay.style.color = "#DC2626";
@@ -268,7 +385,11 @@ const title = "BitTimer - Interval Timer";
                 }
 
                 // Update round display
-                this.roundDisplay.textContent = `Round ${this.currentRound} of ${this.totalRounds}`;
+                if (this.isWarmupPhase) {
+                    this.roundDisplay.textContent = "Warmup";
+                } else {
+                    this.roundDisplay.textContent = `Round ${this.currentRound} of ${this.totalRounds}`;
+                }
 
                 // Update progress bar
                 if (this.totalTime > 0) {
