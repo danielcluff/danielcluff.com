@@ -11,6 +11,117 @@ export default function BitTimer() {
     const [currentRound, setCurrentRound] = createSignal(0);
 
     let intervalId;
+    let audioContext;
+    let workAudio, countdownAudio, completionAudio;
+
+    // Create audio buffers programmatically for iOS silent mode compatibility
+    const createAudioBuffer = (frequency, duration, sampleRate = 44100) => {
+        const length = sampleRate * (duration / 1000);
+        const buffer = audioContext.createBuffer(1, length, sampleRate);
+        const data = buffer.getChannelData(0);
+        
+        for (let i = 0; i < length; i++) {
+            const t = i / sampleRate;
+            data[i] = Math.sin(2 * Math.PI * frequency * t) * 0.3 * Math.exp(-t * 3);
+        }
+        
+        return buffer;
+    };
+
+    // Initialize audio with iOS silent mode support
+    const initAudio = async () => {
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        if (audioContext.state === 'suspended') {
+            await audioContext.resume();
+        }
+
+        // Create HTML5 Audio elements with data URLs for iOS compatibility
+        workAudio = new Audio();
+        countdownAudio = new Audio();
+        completionAudio = new Audio();
+
+        // Set preload and loop properties
+        [workAudio, countdownAudio, completionAudio].forEach(audio => {
+            audio.preload = 'auto';
+            audio.volume = 0.4;
+        });
+
+        // Create short silent audio data URL (iOS requires actual audio data)
+        const createBeepDataURL = (freq, duration) => {
+            const sampleRate = 22050;
+            const samples = Math.floor(sampleRate * (duration / 1000));
+            const buffer = new ArrayBuffer(44 + samples * 2);
+            const view = new DataView(buffer);
+            
+            // WAV header
+            const writeString = (offset, string) => {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
+            };
+            
+            writeString(0, 'RIFF');
+            view.setUint32(4, 36 + samples * 2, true);
+            writeString(8, 'WAVE');
+            writeString(12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeString(36, 'data');
+            view.setUint32(40, samples * 2, true);
+            
+            // Generate beep
+            for (let i = 0; i < samples; i++) {
+                const t = i / sampleRate;
+                const sample = Math.sin(2 * Math.PI * freq * t) * 0.3 * Math.exp(-t * 3);
+                view.setInt16(44 + i * 2, sample * 32767, true);
+            }
+            
+            const blob = new Blob([buffer], { type: 'audio/wav' });
+            return URL.createObjectURL(blob);
+        };
+
+        // Create audio data URLs
+        workAudio.src = createBeepDataURL(1000, 300);
+        countdownAudio.src = createBeepDataURL(600, 150);
+        completionAudio.src = createBeepDataURL(800, 600);
+
+        // Load the audio
+        await Promise.all([
+            new Promise(resolve => { workAudio.oncanplaythrough = resolve; workAudio.load(); }),
+            new Promise(resolve => { countdownAudio.oncanplaythrough = resolve; countdownAudio.load(); }),
+            new Promise(resolve => { completionAudio.oncanplaythrough = resolve; completionAudio.load(); })
+        ]);
+    };
+
+    // Play sound functions
+    const playWorkSound = () => {
+        if (workAudio) {
+            workAudio.currentTime = 0;
+            workAudio.play().catch(e => console.log('Audio play failed:', e));
+        }
+    };
+
+    const playCountdownSound = () => {
+        if (countdownAudio) {
+            countdownAudio.currentTime = 0;
+            countdownAudio.play().catch(e => console.log('Audio play failed:', e));
+        }
+    };
+
+    const playCompletionSound = () => {
+        if (completionAudio) {
+            completionAudio.currentTime = 0;
+            completionAudio.play().catch(e => console.log('Audio play failed:', e));
+        }
+    };
 
     const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
@@ -18,9 +129,10 @@ export default function BitTimer() {
         return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
     };
 
-    const startTimer = () => {
+    const startTimer = async () => {
         if (isRunning()) return;
 
+        await initAudio(); // Initialize audio on user interaction
         console.log("Starting timer...");
         setIsRunning(true);
         setPhase("warmup");
@@ -29,27 +141,37 @@ export default function BitTimer() {
 
         intervalId = setInterval(() => {
             setCurrentTime((prev) => {
+                const currentPhase = phase();
+                
+                // Play countdown sounds for warmup and rest phases
+                if ((currentPhase === "warmup" || currentPhase === "rest") && prev <= 3 && prev > 0) {
+                    playCountdownSound();
+                }
+
                 if (prev <= 0) {
-                    const currentPhase = phase();
                     const round = currentRound();
 
                     if (currentPhase === "warmup") {
                         setPhase("work");
+                        playWorkSound(); // Start of work period
                         return workTime();
                     } else if (currentPhase === "work") {
+                        playWorkSound(); // End of work period
                         setPhase("rest");
                         return restTime();
                     } else if (currentPhase === "rest") {
                         const newRound = round + 1;
                         setCurrentRound(newRound);
 
-                        if (newRound >= repeats()) {
+                        if (newRound > repeats()) {
                             setPhase("finished");
                             setIsRunning(false);
                             clearInterval(intervalId);
+                            playCompletionSound(); // All rounds complete
                             return 0;
                         } else {
                             setPhase("work");
+                            playWorkSound(); // Start of new work period
                             return workTime();
                         }
                     }
