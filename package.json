@@ -4,15 +4,19 @@
     "version": "0.0.2",
     "scripts": {
         "dev": "astro dev",
+        "dev:network": "astro dev --host",
+        "dev:https": "astro dev --host --https",
         "start": "astro dev",
         "build": "astro build",
         "preview": "astro preview",
         "astro": "astro"
     },
     "dependencies": {
+        "@astrojs/solid-js": "^5.1.0",
         "@picocss/pico": "^1.5.10",
         "@tailwindcss/vite": "^4.1.12",
         "astro": "^5.13.4",
+        "solid-js": "^1.9.9",
         "tailwindcss": "^4.1.12"
     }
 }
