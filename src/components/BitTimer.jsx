@@ -1,4 +1,5 @@
 import { createSignal, createEffect, onCleanup } from "solid-js";
+import NoSleep from "nosleep.js";
 
 export default function BitTimer() {
     const [workTime, setWorkTime] = createSignal(30);
@@ -13,6 +14,7 @@ export default function BitTimer() {
     let intervalId;
     let audioContext;
     let workAudio, countdownAudio, completionAudio;
+    let noSleep;
 
     // Create audio buffers programmatically for iOS silent mode compatibility
     const createAudioBuffer = (frequency, duration, sampleRate = 44100) => {
@@ -101,6 +103,35 @@ export default function BitTimer() {
         ]);
     };
 
+    // Initialize NoSleep.js
+    const initNoSleep = () => {
+        if (!noSleep) {
+            noSleep = new NoSleep();
+        }
+    };
+
+    const enableNoSleep = () => {
+        try {
+            if (noSleep) {
+                noSleep.enable();
+                console.log('NoSleep enabled');
+            }
+        } catch (err) {
+            console.log('NoSleep enable failed:', err);
+        }
+    };
+
+    const disableNoSleep = () => {
+        try {
+            if (noSleep && noSleep.isEnabled) {
+                noSleep.disable();
+                console.log('NoSleep disabled');
+            }
+        } catch (err) {
+            console.log('NoSleep disable failed:', err);
+        }
+    };
+
     // Play sound functions
     const playWorkSound = () => {
         if (workAudio) {
@@ -133,6 +164,8 @@ export default function BitTimer() {
         if (isRunning()) return;
 
         await initAudio(); // Initialize audio on user interaction
+        initNoSleep(); // Initialize NoSleep
+        enableNoSleep(); // Prevent device from sleeping
         console.log("Starting timer...");
         setIsRunning(true);
         setPhase("warmup");
@@ -167,6 +200,7 @@ export default function BitTimer() {
                             setPhase("finished");
                             setIsRunning(false);
                             clearInterval(intervalId);
+                            disableNoSleep(); // Allow device to sleep when finished
                             playCompletionSound(); // All rounds complete
                             return 0;
                         } else {
@@ -188,6 +222,7 @@ export default function BitTimer() {
         setCurrentTime(0);
         setCurrentRound(0);
         clearInterval(intervalId);
+        disableNoSleep(); // Allow device to sleep again
     };
 
     const resetTimer = () => {
@@ -196,6 +231,7 @@ export default function BitTimer() {
 
     onCleanup(() => {
         if (intervalId) clearInterval(intervalId);
+        disableNoSleep(); // Clean up NoSleep on component unmount
     });
 
     const getPhaseColor = () => {
