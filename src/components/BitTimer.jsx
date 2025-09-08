@@ -3,13 +3,13 @@ import NoSleep from "nosleep.js";
 
 export default function BitTimer() {
     const [workTime, setWorkTime] = createSignal(30);
-    const [restTime, setRestTime] = createSignal(5);
-    const [repeats, setRepeats] = createSignal(12);
+    const [restTime, setRestTime] = createSignal(10);
+    const [repeats, setRepeats] = createSignal(22);
 
     const [isRunning, setIsRunning] = createSignal(false);
     const [currentTime, setCurrentTime] = createSignal(0);
     const [phase, setPhase] = createSignal("stopped"); // 'stopped', 'warmup', 'work', 'rest', 'finished'
-    const [currentRound, setCurrentRound] = createSignal(0);
+    const [currentRound, setCurrentRound] = createSignal(1);
 
     let intervalId;
     let audioContext;
@@ -21,12 +21,12 @@ export default function BitTimer() {
         const length = sampleRate * (duration / 1000);
         const buffer = audioContext.createBuffer(1, length, sampleRate);
         const data = buffer.getChannelData(0);
-        
+
         for (let i = 0; i < length; i++) {
             const t = i / sampleRate;
             data[i] = Math.sin(2 * Math.PI * frequency * t) * 0.3 * Math.exp(-t * 3);
         }
-        
+
         return buffer;
     };
 
@@ -35,8 +35,8 @@ export default function BitTimer() {
         if (!audioContext) {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
-        
-        if (audioContext.state === 'suspended') {
+
+        if (audioContext.state === "suspended") {
             await audioContext.resume();
         }
 
@@ -46,8 +46,8 @@ export default function BitTimer() {
         completionAudio = new Audio();
 
         // Set preload and loop properties
-        [workAudio, countdownAudio, completionAudio].forEach(audio => {
-            audio.preload = 'auto';
+        [workAudio, countdownAudio, completionAudio].forEach((audio) => {
+            audio.preload = "auto";
             audio.volume = 0.4;
         });
 
@@ -57,18 +57,18 @@ export default function BitTimer() {
             const samples = Math.floor(sampleRate * (duration / 1000));
             const buffer = new ArrayBuffer(44 + samples * 2);
             const view = new DataView(buffer);
-            
+
             // WAV header
             const writeString = (offset, string) => {
                 for (let i = 0; i < string.length; i++) {
                     view.setUint8(offset + i, string.charCodeAt(i));
                 }
             };
-            
-            writeString(0, 'RIFF');
+
+            writeString(0, "RIFF");
             view.setUint32(4, 36 + samples * 2, true);
-            writeString(8, 'WAVE');
-            writeString(12, 'fmt ');
+            writeString(8, "WAVE");
+            writeString(12, "fmt ");
             view.setUint32(16, 16, true);
             view.setUint16(20, 1, true);
             view.setUint16(22, 1, true);
@@ -76,17 +76,17 @@ export default function BitTimer() {
             view.setUint32(28, sampleRate * 2, true);
             view.setUint16(32, 2, true);
             view.setUint16(34, 16, true);
-            writeString(36, 'data');
+            writeString(36, "data");
             view.setUint32(40, samples * 2, true);
-            
+
             // Generate beep
             for (let i = 0; i < samples; i++) {
                 const t = i / sampleRate;
                 const sample = Math.sin(2 * Math.PI * freq * t) * 0.3 * Math.exp(-t * 3);
                 view.setInt16(44 + i * 2, sample * 32767, true);
             }
-            
-            const blob = new Blob([buffer], { type: 'audio/wav' });
+
+            const blob = new Blob([buffer], { type: "audio/wav" });
             return URL.createObjectURL(blob);
         };
 
@@ -97,9 +97,18 @@ export default function BitTimer() {
 
         // Load the audio
         await Promise.all([
-            new Promise(resolve => { workAudio.oncanplaythrough = resolve; workAudio.load(); }),
-            new Promise(resolve => { countdownAudio.oncanplaythrough = resolve; countdownAudio.load(); }),
-            new Promise(resolve => { completionAudio.oncanplaythrough = resolve; completionAudio.load(); })
+            new Promise((resolve) => {
+                workAudio.oncanplaythrough = resolve;
+                workAudio.load();
+            }),
+            new Promise((resolve) => {
+                countdownAudio.oncanplaythrough = resolve;
+                countdownAudio.load();
+            }),
+            new Promise((resolve) => {
+                completionAudio.oncanplaythrough = resolve;
+                completionAudio.load();
+            }),
         ]);
     };
 
@@ -114,10 +123,10 @@ export default function BitTimer() {
         try {
             if (noSleep) {
                 noSleep.enable();
-                console.log('NoSleep enabled');
+                console.log("NoSleep enabled");
             }
         } catch (err) {
-            console.log('NoSleep enable failed:', err);
+            console.log("NoSleep enable failed:", err);
         }
     };
 
@@ -125,10 +134,10 @@ export default function BitTimer() {
         try {
             if (noSleep && noSleep.isEnabled) {
                 noSleep.disable();
-                console.log('NoSleep disabled');
+                console.log("NoSleep disabled");
             }
         } catch (err) {
-            console.log('NoSleep disable failed:', err);
+            console.log("NoSleep disable failed:", err);
         }
     };
 
@@ -136,21 +145,21 @@ export default function BitTimer() {
     const playWorkSound = () => {
         if (workAudio) {
             workAudio.currentTime = 0;
-            workAudio.play().catch(e => console.log('Audio play failed:', e));
+            workAudio.play().catch((e) => console.log("Audio play failed:", e));
         }
     };
 
     const playCountdownSound = () => {
         if (countdownAudio) {
             countdownAudio.currentTime = 0;
-            countdownAudio.play().catch(e => console.log('Audio play failed:', e));
+            countdownAudio.play().catch((e) => console.log("Audio play failed:", e));
         }
     };
 
     const playCompletionSound = () => {
         if (completionAudio) {
             completionAudio.currentTime = 0;
-            completionAudio.play().catch(e => console.log('Audio play failed:', e));
+            completionAudio.play().catch((e) => console.log("Audio play failed:", e));
         }
     };
 
@@ -175,9 +184,13 @@ export default function BitTimer() {
         intervalId = setInterval(() => {
             setCurrentTime((prev) => {
                 const currentPhase = phase();
-                
+
                 // Play countdown sounds for warmup and rest phases
-                if ((currentPhase === "warmup" || currentPhase === "rest") && prev <= 3 && prev > 0) {
+                if (
+                    (currentPhase === "warmup" || currentPhase === "rest") &&
+                    prev <= 3 &&
+                    prev > 0
+                ) {
                     playCountdownSound();
                 }
 
@@ -190,13 +203,9 @@ export default function BitTimer() {
                         return workTime();
                     } else if (currentPhase === "work") {
                         playWorkSound(); // End of work period
-                        setPhase("rest");
-                        return restTime();
-                    } else if (currentPhase === "rest") {
-                        const newRound = round + 1;
-                        setCurrentRound(newRound);
 
-                        if (newRound > repeats()) {
+                        // Check if this is the final round
+                        if (round >= repeats()) {
                             setPhase("finished");
                             setIsRunning(false);
                             clearInterval(intervalId);
@@ -204,10 +213,15 @@ export default function BitTimer() {
                             playCompletionSound(); // All rounds complete
                             return 0;
                         } else {
-                            setPhase("work");
-                            playWorkSound(); // Start of new work period
-                            return workTime();
+                            const newRound = round + 1;
+                            setCurrentRound(newRound);
+                            setPhase("rest");
+                            return restTime();
                         }
+                    } else if (currentPhase === "rest") {
+                        setPhase("work");
+                        playWorkSound(); // Start of new work period
+                        return workTime();
                     }
                     return 0;
                 }
@@ -220,7 +234,7 @@ export default function BitTimer() {
         setIsRunning(false);
         setPhase("stopped");
         setCurrentTime(0);
-        setCurrentRound(0);
+        setCurrentRound(1);
         clearInterval(intervalId);
         disableNoSleep(); // Allow device to sleep again
     };
@@ -239,9 +253,9 @@ export default function BitTimer() {
             case "warmup":
                 return "text-yellow-400";
             case "work":
-                return "text-red-400";
-            case "rest":
                 return "text-green-400";
+            case "rest":
+                return "text-red-400";
             case "finished":
                 return "text-blue-400";
             default:
@@ -347,9 +361,8 @@ export default function BitTimer() {
                     </button>
                 </div>
 
-                
                 <div class="mt-8 text-center">
-                    <div class="text-xs text-zinc-500">v4</div>
+                    <div class="text-xs text-zinc-500">v5</div>
                 </div>
             </div>
         </div>
