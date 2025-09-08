@@ -1,7 +1,7 @@
 import { createSignal, createEffect, onCleanup } from "solid-js";
 import NoSleep from "nosleep.js";
 
-export default function BitTimer() {
+export default function StretchTimer() {
     const [workTime, setWorkTime] = createSignal(30);
     const [restTime, setRestTime] = createSignal(10);
     const [repeats, setRepeats] = createSignal(22);
@@ -281,7 +281,7 @@ export default function BitTimer() {
     return (
         <div class="min-h-screen bg-zinc-900 text-white p-6">
             <div class="max-w-md mx-auto">
-                <h1 class="text-3xl font-bold text-center mb-8 text-zinc-100">BitTimer</h1>
+                <h1 class="text-3xl font-bold text-center mb-8 text-zinc-100">Stretch Timer</h1>
 
                 <div class="bg-zinc-800 rounded-lg p-6 mb-6">
                     <div class="grid grid-cols-3 gap-4 mb-6">
