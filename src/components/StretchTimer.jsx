@@ -337,7 +337,7 @@ export default function StretchTimer() {
                     <div class="text-6xl font-mono font-bold mb-4 text-zinc-100">
                         {formatTime(currentTime())}
                     </div>
-                    <div class="text-zinc-400">
+                    <div class={`text-zinc-400 ${!isRunning() ? 'invisible' : ''}`}>
                         Round {currentRound()} of {repeats()}
                     </div>
                 </div>
