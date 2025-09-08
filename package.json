@@ -12,10 +12,10 @@
         "astro": "astro"
     },
     "dependencies": {
-        "@astrojs/solid-js": "^5.1.0",
+        "@astrojs/solid-js": "^5.1.1",
         "@picocss/pico": "^1.5.10",
         "@tailwindcss/vite": "^4.1.12",
-        "astro": "^5.13.4",
+        "astro": "^5.13.6",
         "nosleep.js": "^0.12.0",
         "solid-js": "^1.9.9",
         "tailwindcss": "^4.1.12"
