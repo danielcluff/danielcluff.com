@@ -196,6 +196,13 @@ export default function StretchTimer() {
         return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
     };
 
+    const calculateTotalDuration = () => {
+        const totalWorkTime = workTime() * repeats();
+        const totalRestTime = restTime() * (repeats() - 1); // One less rest than work periods
+        const warmupTime = 10; // Fixed warmup duration
+        return totalWorkTime + totalRestTime + warmupTime;
+    };
+
     const startTimer = async () => {
         if (isRunning()) return;
 
@@ -375,8 +382,11 @@ export default function StretchTimer() {
                     <div class="text-6xl font-mono font-bold mb-4 text-zinc-100">
                         {formatTime(currentTime())}
                     </div>
-                    <div class={`text-zinc-400 ${!isRunning() ? 'invisible' : ''}`}>
-                        Round {currentRound()} of {repeats()}
+                    <div class="text-zinc-400">
+                        {!isRunning() 
+                            ? `Total duration: ${formatTime(calculateTotalDuration())}`
+                            : `Round ${currentRound()} of ${repeats()}`
+                        }
                     </div>
                 </div>
 
