@@ -43,6 +43,24 @@ export default function StretchTimer() {
     // Load settings when component initializes
     loadSettings();
 
+    // Prevent navigation away while timer is running
+    const handleBeforeUnload = (e) => {
+        if (isRunning()) {
+            e.preventDefault();
+            e.returnValue = 'Timer is running. Are you sure you want to leave?';
+            return 'Timer is running. Are you sure you want to leave?';
+        }
+    };
+
+    // Add/remove beforeunload listener based on timer state
+    createEffect(() => {
+        if (isRunning()) {
+            window.addEventListener('beforeunload', handleBeforeUnload);
+        } else {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        }
+    });
+
     // Create audio buffers programmatically for iOS silent mode compatibility
     const createAudioBuffer = (frequency, duration, sampleRate = 44100) => {
         const length = sampleRate * (duration / 1000);
@@ -308,6 +326,7 @@ export default function StretchTimer() {
         if (intervalId) clearInterval(intervalId);
         disableNoSleep(); // Clean up NoSleep on component unmount
         unlockOrientation(); // Clean up orientation lock on component unmount
+        window.removeEventListener('beforeunload', handleBeforeUnload); // Clean up event listener
     });
 
     const getPhaseColor = () => {
