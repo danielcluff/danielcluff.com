@@ -1,13 +1,14 @@
 ---
 interface Props {
     title: string;
+    bgColor?: string;
 }
 import "../style.css";
-const { title } = Astro.props;
+const { title, bgColor } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="dark" class={bgColor || ""}>
     <head>
         <meta charset="UTF-8" />
         <meta name="description" content="Astro description" />
