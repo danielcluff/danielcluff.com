@@ -1,22 +1,43 @@
 import { createSignal, createEffect, onCleanup } from "solid-js";
-import { makePersisted } from "@solid-primitives/storage";
 import NoSleep from "nosleep.js";
 
 export default function StretchTimer() {
-    const [workTime, setWorkTime] = makePersisted(createSignal(), { 
-        name: "stretchTimer_workTime"
-    });
-    const [restTime, setRestTime] = makePersisted(createSignal(), { 
-        name: "stretchTimer_restTime"
-    });  
-    const [repeats, setRepeats] = makePersisted(createSignal(), { 
-        name: "stretchTimer_repeats"
+    // Initialize with default values (consistent between server and client)
+    const [workTime, setWorkTime] = createSignal(30);
+    const [restTime, setRestTime] = createSignal(15);
+    const [repeats, setRepeats] = createSignal(12);
+    
+    // Load from localStorage after component mounts (client-side only)
+    createEffect(() => {
+        if (typeof window !== 'undefined' && window.localStorage) {
+            const savedWorkTime = localStorage.getItem('stretchTimer_workTime');
+            const savedRestTime = localStorage.getItem('stretchTimer_restTime');
+            const savedRepeats = localStorage.getItem('stretchTimer_repeats');
+            
+            if (savedWorkTime) setWorkTime(parseInt(savedWorkTime));
+            if (savedRestTime) setRestTime(parseInt(savedRestTime));
+            if (savedRepeats) setRepeats(parseInt(savedRepeats));
+        }
     });
     
-    // Set defaults if no stored value exists
-    if (workTime() === undefined) setWorkTime(30);
-    if (restTime() === undefined) setRestTime(15);
-    if (repeats() === undefined) setRepeats(12);
+    // Save to localStorage whenever values change
+    createEffect(() => {
+        if (typeof window !== 'undefined' && window.localStorage) {
+            localStorage.setItem('stretchTimer_workTime', workTime().toString());
+        }
+    });
+    
+    createEffect(() => {
+        if (typeof window !== 'undefined' && window.localStorage) {
+            localStorage.setItem('stretchTimer_restTime', restTime().toString());
+        }
+    });
+    
+    createEffect(() => {
+        if (typeof window !== 'undefined' && window.localStorage) {
+            localStorage.setItem('stretchTimer_repeats', repeats().toString());
+        }
+    });
 
     const [isRunning, setIsRunning] = createSignal(false);
     const [currentTime, setCurrentTime] = createSignal(0);
