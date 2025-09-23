@@ -3,9 +3,20 @@ import { makePersisted } from "@solid-primitives/storage";
 import NoSleep from "nosleep.js";
 
 export default function StretchTimer() {
-    const [workTime, setWorkTime] = makePersisted(createSignal(30), { name: "stretchTimer_workTime" });
-    const [restTime, setRestTime] = makePersisted(createSignal(15), { name: "stretchTimer_restTime" });
-    const [repeats, setRepeats] = makePersisted(createSignal(12), { name: "stretchTimer_repeats" });
+    const [workTime, setWorkTime] = makePersisted(createSignal(), { 
+        name: "stretchTimer_workTime"
+    });
+    const [restTime, setRestTime] = makePersisted(createSignal(), { 
+        name: "stretchTimer_restTime"
+    });  
+    const [repeats, setRepeats] = makePersisted(createSignal(), { 
+        name: "stretchTimer_repeats"
+    });
+    
+    // Set defaults if no stored value exists
+    if (workTime() === undefined) setWorkTime(30);
+    if (restTime() === undefined) setRestTime(15);
+    if (repeats() === undefined) setRepeats(12);
 
     const [isRunning, setIsRunning] = createSignal(false);
     const [currentTime, setCurrentTime] = createSignal(0);
