@@ -3,8 +3,8 @@ import NoSleep from "nosleep.js";
 
 export default function StretchTimer() {
     const [workTime, setWorkTime] = createSignal(30);
-    const [restTime, setRestTime] = createSignal(10);
-    const [repeats, setRepeats] = createSignal(22);
+    const [restTime, setRestTime] = createSignal(15);
+    const [repeats, setRepeats] = createSignal(12);
 
     const [isRunning, setIsRunning] = createSignal(false);
     const [currentTime, setCurrentTime] = createSignal(0);
