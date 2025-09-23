@@ -1,10 +1,11 @@
 import { createSignal, createEffect, onCleanup } from "solid-js";
+import { makePersisted } from "@solid-primitives/storage";
 import NoSleep from "nosleep.js";
 
 export default function StretchTimer() {
-    const [workTime, setWorkTime] = createSignal(30);
-    const [restTime, setRestTime] = createSignal(15);
-    const [repeats, setRepeats] = createSignal(12);
+    const [workTime, setWorkTime] = makePersisted(createSignal(30), { name: "stretchTimer_workTime" });
+    const [restTime, setRestTime] = makePersisted(createSignal(15), { name: "stretchTimer_restTime" });
+    const [repeats, setRepeats] = makePersisted(createSignal(12), { name: "stretchTimer_repeats" });
 
     const [isRunning, setIsRunning] = createSignal(false);
     const [currentTime, setCurrentTime] = createSignal(0);
@@ -16,36 +17,6 @@ export default function StretchTimer() {
     let workAudio, countdownAudio, completionAudio;
     let noSleep;
 
-    // Load settings from localStorage on initialization
-    const loadSettings = () => {
-        try {
-            if (typeof window !== 'undefined' && window.localStorage) {
-                const savedWorkTime = localStorage.getItem('stretchTimer_workTime');
-                const savedRestTime = localStorage.getItem('stretchTimer_restTime');
-                const savedRepeats = localStorage.getItem('stretchTimer_repeats');
-
-                if (savedWorkTime) setWorkTime(parseInt(savedWorkTime));
-                if (savedRestTime) setRestTime(parseInt(savedRestTime));
-                if (savedRepeats) setRepeats(parseInt(savedRepeats));
-            }
-        } catch (error) {
-            console.log('Failed to load settings from localStorage:', error);
-        }
-    };
-
-    // Save individual setting to localStorage
-    const saveSetting = (key, value) => {
-        try {
-            if (typeof window !== 'undefined' && window.localStorage) {
-                localStorage.setItem(`stretchTimer_${key}`, value.toString());
-            }
-        } catch (error) {
-            console.log('Failed to save setting to localStorage:', error);
-        }
-    };
-
-    // Load settings when component initializes
-    loadSettings();
 
     // Prevent navigation away while timer is running
     const handleBeforeUnload = (e) => {
@@ -381,11 +352,7 @@ export default function StretchTimer() {
                             <input
                                 type="number"
                                 value={workTime()}
-                                onInput={(e) => {
-                                    const value = parseInt(e.target.value) || 0;
-                                    setWorkTime(value);
-                                    saveSetting('workTime', value);
-                                }}
+                                onInput={(e) => setWorkTime(parseInt(e.target.value) || 0)}
                                 disabled={isRunning()}
                                 class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-zinc-500 disabled:opacity-50"
                                 min="1"
@@ -399,11 +366,7 @@ export default function StretchTimer() {
                             <input
                                 type="number"
                                 value={restTime()}
-                                onInput={(e) => {
-                                    const value = parseInt(e.target.value) || 0;
-                                    setRestTime(value);
-                                    saveSetting('restTime', value);
-                                }}
+                                onInput={(e) => setRestTime(parseInt(e.target.value) || 0)}
                                 disabled={isRunning()}
                                 class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-zinc-500 disabled:opacity-50"
                                 min="1"
@@ -417,11 +380,7 @@ export default function StretchTimer() {
                             <input
                                 type="number"
                                 value={repeats()}
-                                onInput={(e) => {
-                                    const value = parseInt(e.target.value) || 0;
-                                    setRepeats(value);
-                                    saveSetting('repeats', value);
-                                }}
+                                onInput={(e) => setRepeats(parseInt(e.target.value) || 0)}
                                 disabled={isRunning()}
                                 class="w-full px-3 py-2 bg-zinc-700 border border-zinc-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-zinc-500 disabled:opacity-50"
                                 min="1"
