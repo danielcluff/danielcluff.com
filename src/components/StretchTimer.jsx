@@ -19,13 +19,15 @@ export default function StretchTimer() {
     // Load settings from localStorage on initialization
     const loadSettings = () => {
         try {
-            const savedWorkTime = localStorage.getItem('stretchTimer_workTime');
-            const savedRestTime = localStorage.getItem('stretchTimer_restTime');
-            const savedRepeats = localStorage.getItem('stretchTimer_repeats');
+            if (typeof window !== 'undefined' && window.localStorage) {
+                const savedWorkTime = localStorage.getItem('stretchTimer_workTime');
+                const savedRestTime = localStorage.getItem('stretchTimer_restTime');
+                const savedRepeats = localStorage.getItem('stretchTimer_repeats');
 
-            if (savedWorkTime) setWorkTime(parseInt(savedWorkTime));
-            if (savedRestTime) setRestTime(parseInt(savedRestTime));
-            if (savedRepeats) setRepeats(parseInt(savedRepeats));
+                if (savedWorkTime) setWorkTime(parseInt(savedWorkTime));
+                if (savedRestTime) setRestTime(parseInt(savedRestTime));
+                if (savedRepeats) setRepeats(parseInt(savedRepeats));
+            }
         } catch (error) {
             console.log('Failed to load settings from localStorage:', error);
         }
@@ -34,7 +36,9 @@ export default function StretchTimer() {
     // Save individual setting to localStorage
     const saveSetting = (key, value) => {
         try {
-            localStorage.setItem(`stretchTimer_${key}`, value.toString());
+            if (typeof window !== 'undefined' && window.localStorage) {
+                localStorage.setItem(`stretchTimer_${key}`, value.toString());
+            }
         } catch (error) {
             console.log('Failed to save setting to localStorage:', error);
         }
@@ -54,10 +58,12 @@ export default function StretchTimer() {
 
     // Add/remove beforeunload listener based on timer state
     createEffect(() => {
-        if (isRunning()) {
-            window.addEventListener('beforeunload', handleBeforeUnload);
-        } else {
-            window.removeEventListener('beforeunload', handleBeforeUnload);
+        if (typeof window !== 'undefined') {
+            if (isRunning()) {
+                window.addEventListener('beforeunload', handleBeforeUnload);
+            } else {
+                window.removeEventListener('beforeunload', handleBeforeUnload);
+            }
         }
     });
 
@@ -189,7 +195,7 @@ export default function StretchTimer() {
     // Screen orientation functions
     const lockOrientation = () => {
         try {
-            if (screen.orientation && screen.orientation.lock) {
+            if (typeof window !== 'undefined' && window.screen && screen.orientation && screen.orientation.lock) {
                 // Lock to current orientation
                 const currentOrientation = screen.orientation.type;
                 screen.orientation.lock(currentOrientation);
@@ -202,7 +208,7 @@ export default function StretchTimer() {
 
     const unlockOrientation = () => {
         try {
-            if (screen.orientation && screen.orientation.unlock) {
+            if (typeof window !== 'undefined' && window.screen && screen.orientation && screen.orientation.unlock) {
                 screen.orientation.unlock();
                 console.log("Screen orientation unlocked");
             }
@@ -326,7 +332,9 @@ export default function StretchTimer() {
         if (intervalId) clearInterval(intervalId);
         disableNoSleep(); // Clean up NoSleep on component unmount
         unlockOrientation(); // Clean up orientation lock on component unmount
-        window.removeEventListener('beforeunload', handleBeforeUnload); // Clean up event listener
+        if (typeof window !== 'undefined') {
+            window.removeEventListener('beforeunload', handleBeforeUnload); // Clean up event listener
+        }
     });
 
     const getPhaseColor = () => {
