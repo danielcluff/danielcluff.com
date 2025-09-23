@@ -229,8 +229,6 @@ export default function StretchTimer() {
                         playWorkSound(); // Start of work period
                         return workTime();
                     } else if (currentPhase === "work") {
-                        playWorkSound(); // End of work period
-
                         // Check if this is the final round
                         if (round >= repeats()) {
                             setPhase("finished");
@@ -240,6 +238,7 @@ export default function StretchTimer() {
                             playCompletionSound(); // All rounds complete
                             return 0;
                         } else {
+                            playWorkSound(); // End of work period
                             const newRound = round + 1;
                             setCurrentRound(newRound);
                             setPhase("rest");
