@@ -168,6 +168,31 @@ export default function StretchTimer() {
         }
     };
 
+    // Screen orientation functions
+    const lockOrientation = () => {
+        try {
+            if (screen.orientation && screen.orientation.lock) {
+                // Lock to current orientation
+                const currentOrientation = screen.orientation.type;
+                screen.orientation.lock(currentOrientation);
+                console.log("Screen orientation locked to:", currentOrientation);
+            }
+        } catch (err) {
+            console.log("Orientation lock failed:", err);
+        }
+    };
+
+    const unlockOrientation = () => {
+        try {
+            if (screen.orientation && screen.orientation.unlock) {
+                screen.orientation.unlock();
+                console.log("Screen orientation unlocked");
+            }
+        } catch (err) {
+            console.log("Orientation unlock failed:", err);
+        }
+    };
+
     // Play sound functions
     const playWorkSound = () => {
         if (workAudio) {
@@ -209,6 +234,7 @@ export default function StretchTimer() {
         await initAudio(); // Initialize audio on user interaction
         initNoSleep(); // Initialize NoSleep
         enableNoSleep(); // Prevent device from sleeping
+        lockOrientation(); // Lock screen orientation
         console.log("Starting timer...");
         setIsRunning(true);
         setPhase("warmup");
@@ -242,6 +268,7 @@ export default function StretchTimer() {
                             setIsRunning(false);
                             clearInterval(intervalId);
                             disableNoSleep(); // Allow device to sleep when finished
+                            unlockOrientation(); // Unlock screen orientation
                             playCompletionSound(); // All rounds complete
                             return 0;
                         } else {
@@ -270,6 +297,7 @@ export default function StretchTimer() {
         setCurrentRound(1);
         clearInterval(intervalId);
         disableNoSleep(); // Allow device to sleep again
+        unlockOrientation(); // Unlock screen orientation
     };
 
     const resetTimer = () => {
@@ -279,6 +307,7 @@ export default function StretchTimer() {
     onCleanup(() => {
         if (intervalId) clearInterval(intervalId);
         disableNoSleep(); // Clean up NoSleep on component unmount
+        unlockOrientation(); // Clean up orientation lock on component unmount
     });
 
     const getPhaseColor = () => {
