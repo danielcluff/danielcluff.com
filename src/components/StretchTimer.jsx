@@ -401,7 +401,7 @@ export default function StretchTimer() {
                 </div>
 
                 <div class="mt-8 text-center">
-                    <div class="text-xs text-zinc-500">v5</div>
+                    <div class="text-xs text-zinc-500">v6</div>
                 </div>
             </div>
         </div>
