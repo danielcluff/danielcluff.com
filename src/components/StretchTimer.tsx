@@ -44,14 +44,14 @@ export default function StretchTimer() {
     const [phase, setPhase] = createSignal("stopped"); // 'stopped', 'warmup', 'work', 'rest', 'finished'
     const [currentRound, setCurrentRound] = createSignal(1);
 
-    let intervalId;
-    let audioContext;
-    let workAudio, countdownAudio, completionAudio;
-    let noSleep;
+    let intervalId: ReturnType<typeof setInterval> | undefined;
+    let audioContext: AudioContext | undefined;
+    let workAudio: HTMLAudioElement | undefined, countdownAudio: HTMLAudioElement | undefined, completionAudio: HTMLAudioElement | undefined;
+    let noSleep: NoSleep | undefined;
 
 
     // Prevent navigation away while timer is running
-    const handleBeforeUnload = (e) => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
         if (isRunning()) {
             e.preventDefault();
             e.returnValue = 'Timer is running. Are you sure you want to leave?';
@@ -71,9 +71,9 @@ export default function StretchTimer() {
     });
 
     // Create audio buffers programmatically for iOS silent mode compatibility
-    const createAudioBuffer = (frequency, duration, sampleRate = 44100) => {
+    const createAudioBuffer = (frequency: number, duration: number, sampleRate = 44100) => {
         const length = sampleRate * (duration / 1000);
-        const buffer = audioContext.createBuffer(1, length, sampleRate);
+        const buffer = audioContext!.createBuffer(1, length, sampleRate);
         const data = buffer.getChannelData(0);
 
         for (let i = 0; i < length; i++) {
@@ -87,7 +87,7 @@ export default function StretchTimer() {
     // Initialize audio with iOS silent mode support
     const initAudio = async () => {
         if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
         }
 
         if (audioContext.state === "suspended") {
@@ -106,14 +106,14 @@ export default function StretchTimer() {
         });
 
         // Create short silent audio data URL (iOS requires actual audio data)
-        const createBeepDataURL = (freq, duration) => {
+        const createBeepDataURL = (freq: number, duration: number) => {
             const sampleRate = 22050;
             const samples = Math.floor(sampleRate * (duration / 1000));
             const buffer = new ArrayBuffer(44 + samples * 2);
             const view = new DataView(buffer);
 
             // WAV header
-            const writeString = (offset, string) => {
+            const writeString = (offset: number, string: string) => {
                 for (let i = 0; i < string.length; i++) {
                     view.setUint8(offset + i, string.charCodeAt(i));
                 }
@@ -152,16 +152,16 @@ export default function StretchTimer() {
         // Load the audio
         await Promise.all([
             new Promise((resolve) => {
-                workAudio.oncanplaythrough = resolve;
-                workAudio.load();
+                workAudio!.oncanplaythrough = resolve;
+                workAudio!.load();
             }),
             new Promise((resolve) => {
-                countdownAudio.oncanplaythrough = resolve;
-                countdownAudio.load();
+                countdownAudio!.oncanplaythrough = resolve;
+                countdownAudio!.load();
             }),
             new Promise((resolve) => {
-                completionAudio.oncanplaythrough = resolve;
-                completionAudio.load();
+                completionAudio!.oncanplaythrough = resolve;
+                completionAudio!.load();
             }),
         ]);
     };
@@ -198,10 +198,10 @@ export default function StretchTimer() {
     // Screen orientation functions
     const lockOrientation = () => {
         try {
-            if (typeof window !== 'undefined' && window.screen && screen.orientation && screen.orientation.lock) {
+            if (typeof window !== 'undefined' && window.screen && screen.orientation && (screen.orientation as any).lock) {
                 // Lock to current orientation
                 const currentOrientation = screen.orientation.type;
-                screen.orientation.lock(currentOrientation);
+                (screen.orientation as any).lock(currentOrientation);
                 console.log("Screen orientation locked to:", currentOrientation);
             }
         } catch (err) {
@@ -224,25 +224,25 @@ export default function StretchTimer() {
     const playWorkSound = () => {
         if (workAudio) {
             workAudio.currentTime = 0;
-            workAudio.play().catch((e) => console.log("Audio play failed:", e));
+            workAudio.play().catch((e: Error) => console.log("Audio play failed:", e));
         }
     };
 
     const playCountdownSound = () => {
         if (countdownAudio) {
             countdownAudio.currentTime = 0;
-            countdownAudio.play().catch((e) => console.log("Audio play failed:", e));
+            countdownAudio.play().catch((e: Error) => console.log("Audio play failed:", e));
         }
     };
 
     const playCompletionSound = () => {
         if (completionAudio) {
             completionAudio.currentTime = 0;
-            completionAudio.play().catch((e) => console.log("Audio play failed:", e));
+            completionAudio.play().catch((e: Error) => console.log("Audio play failed:", e));
         }
     };
 
-    const formatTime = (seconds) => {
+    const formatTime = (seconds: number) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
         return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
