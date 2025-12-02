@@ -6,36 +6,36 @@ export default function StretchTimer() {
     const [workTime, setWorkTime] = createSignal(30);
     const [restTime, setRestTime] = createSignal(15);
     const [repeats, setRepeats] = createSignal(12);
-    
+
     // Load from localStorage after component mounts (client-side only)
     createEffect(() => {
-        if (typeof window !== 'undefined' && window.localStorage) {
-            const savedWorkTime = localStorage.getItem('stretchTimer_workTime');
-            const savedRestTime = localStorage.getItem('stretchTimer_restTime');
-            const savedRepeats = localStorage.getItem('stretchTimer_repeats');
-            
+        if (typeof window !== "undefined" && window.localStorage) {
+            const savedWorkTime = localStorage.getItem("stretchTimer_workTime");
+            const savedRestTime = localStorage.getItem("stretchTimer_restTime");
+            const savedRepeats = localStorage.getItem("stretchTimer_repeats");
+
             if (savedWorkTime) setWorkTime(parseInt(savedWorkTime));
             if (savedRestTime) setRestTime(parseInt(savedRestTime));
             if (savedRepeats) setRepeats(parseInt(savedRepeats));
         }
     });
-    
+
     // Save to localStorage whenever values change
     createEffect(() => {
-        if (typeof window !== 'undefined' && window.localStorage) {
-            localStorage.setItem('stretchTimer_workTime', workTime().toString());
+        if (typeof window !== "undefined" && window.localStorage) {
+            localStorage.setItem("stretchTimer_workTime", workTime().toString());
         }
     });
-    
+
     createEffect(() => {
-        if (typeof window !== 'undefined' && window.localStorage) {
-            localStorage.setItem('stretchTimer_restTime', restTime().toString());
+        if (typeof window !== "undefined" && window.localStorage) {
+            localStorage.setItem("stretchTimer_restTime", restTime().toString());
         }
     });
-    
+
     createEffect(() => {
-        if (typeof window !== 'undefined' && window.localStorage) {
-            localStorage.setItem('stretchTimer_repeats', repeats().toString());
+        if (typeof window !== "undefined" && window.localStorage) {
+            localStorage.setItem("stretchTimer_repeats", repeats().toString());
         }
     });
 
@@ -46,45 +46,33 @@ export default function StretchTimer() {
 
     let intervalId: ReturnType<typeof setInterval> | undefined;
     let audioContext: AudioContext | undefined;
-    let workAudio: HTMLAudioElement | undefined, countdownAudio: HTMLAudioElement | undefined, completionAudio: HTMLAudioElement | undefined;
+    let workAudio: HTMLAudioElement | undefined,
+        roundAudio: HTMLAudioElement | undefined,
+        countdownAudio: HTMLAudioElement | undefined,
+        completionAudio: HTMLAudioElement | undefined;
     let noSleep: NoSleep | undefined;
-
 
     // Prevent navigation away while timer is running
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
         if (isRunning()) {
             e.preventDefault();
-            e.returnValue = 'Timer is running. Are you sure you want to leave?';
-            return 'Timer is running. Are you sure you want to leave?';
+            e.returnValue = "Timer is running. Are you sure you want to leave?";
+            return "Timer is running. Are you sure you want to leave?";
         }
     };
 
     // Add/remove beforeunload listener based on timer state
     createEffect(() => {
-        if (typeof window !== 'undefined') {
+        if (typeof window !== "undefined") {
             if (isRunning()) {
-                window.addEventListener('beforeunload', handleBeforeUnload);
+                window.addEventListener("beforeunload", handleBeforeUnload);
             } else {
-                window.removeEventListener('beforeunload', handleBeforeUnload);
+                window.removeEventListener("beforeunload", handleBeforeUnload);
             }
         }
     });
 
-    // Create audio buffers programmatically for iOS silent mode compatibility
-    const createAudioBuffer = (frequency: number, duration: number, sampleRate = 44100) => {
-        const length = sampleRate * (duration / 1000);
-        const buffer = audioContext!.createBuffer(1, length, sampleRate);
-        const data = buffer.getChannelData(0);
-
-        for (let i = 0; i < length; i++) {
-            const t = i / sampleRate;
-            data[i] = Math.sin(2 * Math.PI * frequency * t) * 0.3 * Math.exp(-t * 3);
-        }
-
-        return buffer;
-    };
-
-    // Initialize audio with iOS silent mode support
+    // Initialize audio with custom sound files
     const initAudio = async () => {
         if (!audioContext) {
             audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -94,66 +82,32 @@ export default function StretchTimer() {
             await audioContext.resume();
         }
 
-        // Create HTML5 Audio elements with data URLs for iOS compatibility
-        workAudio = new Audio();
-        countdownAudio = new Audio();
-        completionAudio = new Audio();
+        // Create HTML5 Audio elements for custom sound files
+        workAudio = new Audio("/audio/start.mp3");
+        roundAudio = new Audio("/audio/round.mp3");
+        countdownAudio = new Audio("/audio/countdown.mp3");
+        completionAudio = new Audio("/audio/end.mp3");
 
-        // Set preload and loop properties
-        [workAudio, countdownAudio, completionAudio].forEach((audio) => {
+        // Set preload for all audio files
+        [workAudio, roundAudio, countdownAudio, completionAudio].forEach((audio) => {
             audio.preload = "auto";
-            audio.volume = 0.4;
         });
 
-        // Create short silent audio data URL (iOS requires actual audio data)
-        const createBeepDataURL = (freq: number, duration: number) => {
-            const sampleRate = 22050;
-            const samples = Math.floor(sampleRate * (duration / 1000));
-            const buffer = new ArrayBuffer(44 + samples * 2);
-            const view = new DataView(buffer);
+        // Set individual volumes
+        workAudio.volume = 1.0;
+        roundAudio.volume = 1.0;
+        countdownAudio.volume = 0.6;
+        completionAudio.volume = 1.0;
 
-            // WAV header
-            const writeString = (offset: number, string: string) => {
-                for (let i = 0; i < string.length; i++) {
-                    view.setUint8(offset + i, string.charCodeAt(i));
-                }
-            };
-
-            writeString(0, "RIFF");
-            view.setUint32(4, 36 + samples * 2, true);
-            writeString(8, "WAVE");
-            writeString(12, "fmt ");
-            view.setUint32(16, 16, true);
-            view.setUint16(20, 1, true);
-            view.setUint16(22, 1, true);
-            view.setUint32(24, sampleRate, true);
-            view.setUint32(28, sampleRate * 2, true);
-            view.setUint16(32, 2, true);
-            view.setUint16(34, 16, true);
-            writeString(36, "data");
-            view.setUint32(40, samples * 2, true);
-
-            // Generate beep
-            for (let i = 0; i < samples; i++) {
-                const t = i / sampleRate;
-                const sample = Math.sin(2 * Math.PI * freq * t) * 0.3 * Math.exp(-t * 3);
-                view.setInt16(44 + i * 2, sample * 32767, true);
-            }
-
-            const blob = new Blob([buffer], { type: "audio/wav" });
-            return URL.createObjectURL(blob);
-        };
-
-        // Create audio data URLs
-        workAudio.src = createBeepDataURL(1000, 300);
-        countdownAudio.src = createBeepDataURL(600, 150);
-        completionAudio.src = createBeepDataURL(800, 600);
-
-        // Load the audio
+        // Load the audio files
         await Promise.all([
             new Promise((resolve) => {
                 workAudio!.oncanplaythrough = resolve;
                 workAudio!.load();
+            }),
+            new Promise((resolve) => {
+                roundAudio!.oncanplaythrough = resolve;
+                roundAudio!.load();
             }),
             new Promise((resolve) => {
                 countdownAudio!.oncanplaythrough = resolve;
@@ -198,7 +152,12 @@ export default function StretchTimer() {
     // Screen orientation functions
     const lockOrientation = () => {
         try {
-            if (typeof window !== 'undefined' && window.screen && screen.orientation && (screen.orientation as any).lock) {
+            if (
+                typeof window !== "undefined" &&
+                window.screen &&
+                screen.orientation &&
+                (screen.orientation as any).lock
+            ) {
                 // Lock to current orientation
                 const currentOrientation = screen.orientation.type;
                 (screen.orientation as any).lock(currentOrientation);
@@ -211,7 +170,12 @@ export default function StretchTimer() {
 
     const unlockOrientation = () => {
         try {
-            if (typeof window !== 'undefined' && window.screen && screen.orientation && screen.orientation.unlock) {
+            if (
+                typeof window !== "undefined" &&
+                window.screen &&
+                screen.orientation &&
+                screen.orientation.unlock
+            ) {
                 screen.orientation.unlock();
                 console.log("Screen orientation unlocked");
             }
@@ -225,6 +189,13 @@ export default function StretchTimer() {
         if (workAudio) {
             workAudio.currentTime = 0;
             workAudio.play().catch((e: Error) => console.log("Audio play failed:", e));
+        }
+    };
+
+    const playRoundSound = () => {
+        if (roundAudio) {
+            roundAudio.currentTime = 0;
+            roundAudio.play().catch((e: Error) => console.log("Audio play failed:", e));
         }
     };
 
@@ -335,8 +306,8 @@ export default function StretchTimer() {
         if (intervalId) clearInterval(intervalId);
         disableNoSleep(); // Clean up NoSleep on component unmount
         unlockOrientation(); // Clean up orientation lock on component unmount
-        if (typeof window !== 'undefined') {
-            window.removeEventListener('beforeunload', handleBeforeUnload); // Clean up event listener
+        if (typeof window !== "undefined") {
+            window.removeEventListener("beforeunload", handleBeforeUnload); // Clean up event listener
         }
     });
 
@@ -430,10 +401,9 @@ export default function StretchTimer() {
                         {formatTime(currentTime())}
                     </div>
                     <div class="text-zinc-400">
-                        {!isRunning() 
+                        {!isRunning()
                             ? `Total duration: ${formatTime(calculateTotalDuration())}`
-                            : `Round ${currentRound()} of ${repeats()}`
-                        }
+                            : `Round ${currentRound()} of ${repeats()}`}
                     </div>
                 </div>
 
@@ -457,7 +427,7 @@ export default function StretchTimer() {
                 </div>
 
                 <div class="mt-8 text-center">
-                    <div class="text-xs text-zinc-500">v6</div>
+                    <div class="text-xs text-zinc-500">v7</div>
                 </div>
             </div>
         </div>
