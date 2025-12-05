@@ -81,6 +81,15 @@ export default function StretchTimer() {
 
     // Initialize audio with Web Audio API for reliable mobile playback
     const initAudio = async () => {
+        // Set audio session type to "playback" for iOS 17+ to enable audio on muted devices
+        if (typeof navigator !== "undefined" && (navigator as any).audioSession) {
+            try {
+                (navigator as any).audioSession.type = "playback";
+            } catch (error) {
+                console.error("Failed to set audio session type:", error);
+            }
+        }
+
         if (!audioContext) {
             audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
         }
@@ -97,7 +106,6 @@ export default function StretchTimer() {
                 loadAudioBuffer("/audio/countdown.mp3"),
                 loadAudioBuffer("/audio/end.mp3"),
             ]);
-
         } catch (error) {
             throw error;
         }
