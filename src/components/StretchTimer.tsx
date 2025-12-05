@@ -46,10 +46,10 @@ export default function StretchTimer() {
 
     let intervalId: ReturnType<typeof setInterval> | undefined;
     let audioContext: AudioContext | undefined;
-    let workAudio: HTMLAudioElement | undefined,
-        roundAudio: HTMLAudioElement | undefined,
-        countdownAudio: HTMLAudioElement | undefined,
-        completionAudio: HTMLAudioElement | undefined;
+    let workBuffer: AudioBuffer | undefined,
+        roundBuffer: AudioBuffer | undefined,
+        countdownBuffer: AudioBuffer | undefined,
+        completionBuffer: AudioBuffer | undefined;
     let noSleep: NoSleep | undefined;
 
     // Prevent navigation away while timer is running
@@ -72,7 +72,14 @@ export default function StretchTimer() {
         }
     });
 
-    // Initialize audio with custom sound files
+    // Fetch and decode audio file into an AudioBuffer
+    const loadAudioBuffer = async (url: string): Promise<AudioBuffer> => {
+        const response = await fetch(url);
+        const arrayBuffer = await response.arrayBuffer();
+        return await audioContext!.decodeAudioData(arrayBuffer);
+    };
+
+    // Initialize audio with Web Audio API for reliable mobile playback
     const initAudio = async () => {
         if (!audioContext) {
             audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -82,42 +89,18 @@ export default function StretchTimer() {
             await audioContext.resume();
         }
 
-        // Create HTML5 Audio elements for custom sound files
-        workAudio = new Audio("/audio/start.mp3");
-        roundAudio = new Audio("/audio/round.mp3");
-        countdownAudio = new Audio("/audio/countdown.mp3");
-        completionAudio = new Audio("/audio/end.mp3");
+        // Load and decode all audio files into buffers for instant, reliable playback
+        try {
+            [workBuffer, roundBuffer, countdownBuffer, completionBuffer] = await Promise.all([
+                loadAudioBuffer("/audio/start.mp3"),
+                loadAudioBuffer("/audio/round.mp3"),
+                loadAudioBuffer("/audio/countdown.mp3"),
+                loadAudioBuffer("/audio/end.mp3"),
+            ]);
 
-        // Set preload for all audio files
-        [workAudio, roundAudio, countdownAudio, completionAudio].forEach((audio) => {
-            audio.preload = "auto";
-        });
-
-        // Set individual volumes
-        workAudio.volume = 1.0;
-        roundAudio.volume = 1.0;
-        countdownAudio.volume = 0.6;
-        completionAudio.volume = 1.0;
-
-        // Load the audio files
-        await Promise.all([
-            new Promise((resolve) => {
-                workAudio!.oncanplaythrough = resolve;
-                workAudio!.load();
-            }),
-            new Promise((resolve) => {
-                roundAudio!.oncanplaythrough = resolve;
-                roundAudio!.load();
-            }),
-            new Promise((resolve) => {
-                countdownAudio!.oncanplaythrough = resolve;
-                countdownAudio!.load();
-            }),
-            new Promise((resolve) => {
-                completionAudio!.oncanplaythrough = resolve;
-                completionAudio!.load();
-            }),
-        ]);
+        } catch (error) {
+            throw error;
+        }
     };
 
     // Initialize NoSleep.js
@@ -184,34 +167,43 @@ export default function StretchTimer() {
         }
     };
 
-    // Play sound functions
-    const playWorkSound = () => {
-        if (workAudio) {
-            workAudio.currentTime = 0;
-            workAudio.play().catch((e: Error) => console.log("Audio play failed:", e));
+    // Play audio buffer with Web Audio API - creates a new source each time for reliable playback
+    const playBuffer = (buffer: AudioBuffer | undefined, volume: number = 1.0) => {
+        if (!audioContext || !buffer) {
+            console.warn("Audio not ready");
+            return;
+        }
+
+        try {
+            // Ensure audio context is running (important for mobile)
+            if (audioContext.state === "suspended") {
+                audioContext.resume();
+            }
+
+            // Create a new source node for each play (allows overlapping sounds)
+            const source = audioContext.createBufferSource();
+            source.buffer = buffer;
+
+            // Create gain node for volume control
+            const gainNode = audioContext.createGain();
+            gainNode.gain.value = volume;
+
+            // Connect: source -> gain -> destination
+            source.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            // Start playback immediately
+            source.start(0);
+        } catch (error) {
+            console.error("Audio playback error:", error);
         }
     };
 
-    const playRoundSound = () => {
-        if (roundAudio) {
-            roundAudio.currentTime = 0;
-            roundAudio.play().catch((e: Error) => console.log("Audio play failed:", e));
-        }
-    };
-
-    const playCountdownSound = () => {
-        if (countdownAudio) {
-            countdownAudio.currentTime = 0;
-            countdownAudio.play().catch((e: Error) => console.log("Audio play failed:", e));
-        }
-    };
-
-    const playCompletionSound = () => {
-        if (completionAudio) {
-            completionAudio.currentTime = 0;
-            completionAudio.play().catch((e: Error) => console.log("Audio play failed:", e));
-        }
-    };
+    // Play sound functions with appropriate volumes
+    const playWorkSound = () => playBuffer(workBuffer, 1.0);
+    const playRoundSound = () => playBuffer(roundBuffer, 1.0);
+    const playCountdownSound = () => playBuffer(countdownBuffer, 0.6);
+    const playCompletionSound = () => playBuffer(completionBuffer, 1.0);
 
     const formatTime = (seconds: number) => {
         const mins = Math.floor(seconds / 60);
@@ -270,7 +262,7 @@ export default function StretchTimer() {
                             playCompletionSound(); // All rounds complete
                             return 0;
                         } else {
-                            playWorkSound(); // End of work period
+                            playRoundSound(); // End of work period
                             const newRound = round + 1;
                             setCurrentRound(newRound);
                             setPhase("rest");
@@ -427,7 +419,7 @@ export default function StretchTimer() {
                 </div>
 
                 <div class="mt-8 text-center">
-                    <div class="text-xs text-zinc-500">v7</div>
+                    <div class="text-xs text-zinc-500">v8</div>
                 </div>
             </div>
         </div>
