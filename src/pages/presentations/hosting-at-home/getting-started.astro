@@ -1,0 +1,22 @@
+---
+import SlideLayout from "../../../components/presentations/hosting-at-home/SlideLayout.astro";
+import ContentSlide from "../../../components/presentations/hosting-at-home/ContentSlide.astro";
+import { withBase } from "../../../components/presentations/hosting-at-home/deck";
+---
+
+<SlideLayout title="Getting Started">
+    <ContentSlide
+        title="Simple host"
+        eyebrow="Getting Started"
+        qr={withBase("/presentations/hosting-at-home/cloudflare-qr.svg")}
+        qrAlt="Cloudflare QR code"
+        qrPlacement="center-right"
+    >
+        <p>On your server</p>
+        <ul>
+            <li>Install cloudflared</li>
+            <li>Create a cloudflare tunnel</li>
+            <li>Publish an application</li>
+        </ul>
+    </ContentSlide>
+</SlideLayout>

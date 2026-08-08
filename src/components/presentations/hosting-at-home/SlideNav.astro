@@ -1,0 +1,50 @@
+---
+interface Props {
+  prevHref?: string | null;
+  nextHref?: string | null;
+  index: number;
+  total: number;
+}
+
+const { prevHref, nextHref, index, total } = Astro.props;
+---
+
+<nav
+  class="pointer-events-none fixed inset-0 z-40"
+  aria-label="Slide navigation"
+>
+  {
+    prevHref ? (
+      <a
+        href={prevHref}
+        class="pointer-events-auto group absolute top-1/2 left-0 flex h-28 w-16 -translate-y-1/2 items-center justify-center text-stone-400 transition-colors hover:text-stone-900 focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-orange-600 md:w-20"
+        aria-label="Previous slide"
+      >
+        <span class="text-4xl font-light opacity-40 transition-opacity group-hover:opacity-100 md:text-5xl">
+          ‹
+        </span>
+      </a>
+    ) : null
+  }
+
+  {
+    nextHref ? (
+      <a
+        href={nextHref}
+        class="pointer-events-auto group absolute top-1/2 right-0 flex h-28 w-16 -translate-y-1/2 items-center justify-center text-stone-400 transition-colors hover:text-stone-900 focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-orange-600 md:w-20"
+        aria-label="Next slide"
+      >
+        <span class="text-4xl font-light opacity-40 transition-opacity group-hover:opacity-100 md:text-5xl">
+          ›
+        </span>
+      </a>
+    ) : null
+  }
+
+  <div
+    class="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 text-[clamp(1.125rem,1.5vw,1.375rem)] tracking-wide text-stone-500 tabular-nums"
+    aria-live="polite"
+  >
+    {index >= 0 ? `${index + 1} / ${total}` : null}
+  </div>
+</nav>

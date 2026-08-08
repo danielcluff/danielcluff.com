@@ -1,0 +1,16 @@
+---
+import SlideLayout from "../../../components/presentations/hosting-at-home/SlideLayout.astro";
+import ContentSlide from "../../../components/presentations/hosting-at-home/ContentSlide.astro";
+---
+
+<SlideLayout title="The Old Way">
+    <ContentSlide title="Port Forwarding" eyebrow="The Old Way">
+        <ul>
+            <li>Must open inbound ports on your router (80, 443, SSH...)</li>
+            <li>Every open port is a potential attack surface</li>
+            <li>IP can be scanned, DDoS'd, or brute-forced directly</li>
+            <li>IP changes when your ISP feels like it — DNS breaks</li>
+            <li>No protection layer between attacker and your machine</li>
+        </ul>
+    </ContentSlide>
+</SlideLayout>

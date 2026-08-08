@@ -1,0 +1,168 @@
+---
+type ImagePlacement =
+    | "top-left"
+    | "top-center"
+    | "top-right"
+    | "center-left"
+    | "center"
+    | "center-right"
+    | "bottom-left"
+    | "bottom-center"
+    | "bottom-right"
+    | "backdrop";
+
+type ImageFit = "contain" | "cover";
+
+interface Props {
+    title: string;
+    eyebrow?: string;
+    image?: string;
+    imageAlt?: string;
+    imagePlacement?: ImagePlacement;
+    imageFit?: ImageFit;
+    imageClass?: string;
+    imageOverlay?: boolean;
+    qr?: string;
+    qrAlt?: string;
+    qrPlacement?: ImagePlacement;
+    qrClass?: string;
+}
+
+const {
+    title,
+    eyebrow,
+    image,
+    imageAlt = "",
+    imagePlacement = "center-right",
+    imageFit = "contain",
+    imageClass = "",
+    imageOverlay = false,
+    qr,
+    qrAlt = "",
+    qrPlacement = "top-right",
+    qrClass = "",
+} = Astro.props;
+
+const hasImageSlot = Astro.slots.has("image");
+const hasImage = Boolean(image) || hasImageSlot;
+const hasQr = Boolean(qr);
+const fitClass = imageFit === "cover" ? "object-cover" : "object-contain";
+
+const alignClass: Record<Exclude<ImagePlacement, "backdrop">, string> = {
+    "top-left": "items-start justify-start",
+    "top-center": "items-start justify-center",
+    "top-right": "items-start justify-end",
+    "center-left": "items-center justify-start",
+    center: "items-center justify-center",
+    "center-right": "items-center justify-end",
+    "bottom-left": "items-end justify-start",
+    "bottom-center": "items-end justify-center",
+    "bottom-right": "items-end justify-end",
+};
+
+function frameClass(placement: ImagePlacement) {
+    if (placement === "backdrop") {
+        return "pointer-events-none absolute inset-0 z-0 overflow-hidden";
+    }
+    return [
+        "pointer-events-none absolute inset-0 z-0 flex overflow-hidden p-4 md:p-8",
+        alignClass[placement],
+    ];
+}
+---
+
+<section class="relative flex min-h-[70dvh] flex-col justify-center gap-8">
+    {
+        hasImage ? (
+            imagePlacement === "backdrop" ? (
+                <div class:list={frameClass("backdrop")} aria-hidden={imageAlt ? undefined : true}>
+                    <div class="relative h-full w-full">
+                        {hasImageSlot ? (
+                            <div class:list={["h-full w-full", imageClass]}>
+                                <slot name="image" />
+                            </div>
+                        ) : (
+                            <img
+                                src={image}
+                                alt={imageAlt}
+                                class:list={[
+                                    "h-full w-full object-cover object-center",
+                                    imageClass,
+                                ]}
+                            />
+                        )}
+                        {imageOverlay ? (
+                            <div class="absolute inset-0 bg-white/50" aria-hidden="true" />
+                        ) : null}
+                    </div>
+                </div>
+            ) : (
+                <div
+                    class:list={frameClass(imagePlacement)}
+                    aria-hidden={imageAlt ? undefined : true}
+                >
+                    <div
+                        class:list={[
+                            "relative max-h-full max-w-[min(100%,28rem)] origin-center scale-150 md:max-w-[min(100%,36rem)]",
+                            imageClass,
+                        ]}
+                    >
+                        {hasImageSlot ? (
+                            <slot name="image" />
+                        ) : (
+                            <img
+                                src={image}
+                                alt={imageAlt}
+                                class:list={[
+                                    "block h-auto w-auto max-h-[50dvh] max-w-full",
+                                    fitClass,
+                                ]}
+                            />
+                        )}
+                        {imageOverlay ? (
+                            <div class="absolute inset-0 bg-white/50" aria-hidden="true" />
+                        ) : null}
+                    </div>
+                </div>
+            )
+        ) : null
+    }
+
+    {
+        hasQr ? (
+            <div
+                class:list={frameClass(qrPlacement === "backdrop" ? "center" : qrPlacement)}
+                aria-hidden={qrAlt ? undefined : true}
+            >
+                <div
+                    class:list={[
+                        "relative h-52 w-52 shrink-0 overflow-hidden rounded-lg bg-white shadow-sm md:h-64 md:w-64",
+                        qrClass,
+                    ]}
+                >
+                    <img src={qr} alt={qrAlt} class="block h-full w-full object-contain" />
+                </div>
+            </div>
+        ) : null
+    }
+
+    {
+        eyebrow ? (
+            <p class="relative z-10 text-[clamp(1.125rem,1.5vw,1.375rem)] font-semibold tracking-[0.14em] text-orange-600 uppercase">
+                {eyebrow}
+            </p>
+        ) : null
+    }
+
+    <h1
+        class="relative z-10 max-w-5xl text-[clamp(2.75rem,4.5vw,4rem)] leading-[1.1] font-semibold tracking-tight text-balance"
+    >
+        {title}
+    </h1>
+
+    <div
+        class="relative z-10 max-w-4xl space-y-6 text-[clamp(1.5rem,2.1vw,2rem)] leading-relaxed text-stone-600 [&_li]:leading-relaxed [&_strong]:font-semibold [&_strong]:text-stone-900 [&_ul]:list-disc [&_ul]:space-y-4 [&_ul]:pl-10"
+    >
+        <slot />
+    </div>
+</section>

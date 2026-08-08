@@ -1,0 +1,15 @@
+---
+import SlideLayout from "../../../components/presentations/hosting-at-home/SlideLayout.astro";
+import ContentSlide from "../../../components/presentations/hosting-at-home/ContentSlide.astro";
+---
+
+<SlideLayout title="Kuberentes">
+    <ContentSlide title="Hardening the Homelab" eyebrow="Kuberentes part 2">
+        <ul>
+            <li>Migrate from Flannel to Cilium for Network Policy enforcement</li>
+            <li>RBAC: Rule based access control</li>
+            <li>Sealed Secrets for secret encryption</li>
+            <li>Separate Traefik instance for public traffic</li>
+        </ul>
+    </ContentSlide>
+</SlideLayout>

@@ -1,0 +1,23 @@
+---
+import SlideLayout from "../../../components/presentations/hosting-at-home/SlideLayout.astro";
+import ContentSlide from "../../../components/presentations/hosting-at-home/ContentSlide.astro";
+import { withBase } from "../../../components/presentations/hosting-at-home/deck";
+---
+
+<SlideLayout title="Hardware">
+    <ContentSlide
+        title="Hardware"
+        eyebrow="What can I use?"
+        image={withBase("/presentations/hosting-at-home/dusty.webp")}
+        imageAlt="Dusty"
+        imageOverlay
+    >
+        <p>You probably have more compute sitting around than you think</p>
+
+        <li>Raspberry Pi — low power, always-on</li>
+        <li>Old laptop — dedicated server with a built-in UPS</li>
+        <li>Mini PC — quiet, efficient, surprisingly powerful</li>
+
+        <p>Any of these can serve real web traffic</p>
+    </ContentSlide>
+</SlideLayout>

@@ -1,0 +1,18 @@
+---
+import SlideLayout from "../../../components/presentations/hosting-at-home/SlideLayout.astro";
+import ContentSlide from "../../../components/presentations/hosting-at-home/ContentSlide.astro";
+---
+
+<SlideLayout title="Cloudflare">
+    <ContentSlide title="Cloudflare" eyebrow="New Hotness">
+        <ul>
+            <li>Zero open inbound ports — cloudflare connects outbound only</li>
+            <li>Your home IP is never exposed or even known to visitors</li>
+            <li>All traffic passes through Cloudflare's edge first</li>
+            <li>DDoS protection, WAF rules</li>
+            <li>Bot management and rate limiting</li>
+            <li>TLS termination and free certificates</li>
+            <li>and more...</li>
+        </ul>
+    </ContentSlide>
+</SlideLayout>

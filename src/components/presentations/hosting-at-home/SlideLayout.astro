@@ -1,0 +1,120 @@
+---
+import { ClientRouter } from "astro:transitions";
+import { slide } from "astro:transitions";
+import SlideNav from "./SlideNav.astro";
+import { getSlideNav, slides, withBase } from "./deck";
+import "../../../style.css";
+
+interface Props {
+    title?: string;
+}
+
+const { title } = Astro.props;
+const currentPath = Astro.url.pathname.replace(/\/$/, "") || "/";
+const { index, total, prev, next, current } = getSlideNav(currentPath);
+const pageTitle = title ?? current?.title ?? "Presentation";
+const faviconSvg = withBase("/favicon.svg");
+const faviconIco = withBase("/favicon.ico");
+const homePath = slides[0]?.path ?? withBase("/slides/intro");
+const isOpeningSlide = currentPath === slides[0]?.path;
+---
+
+<!doctype html>
+<html
+    lang="en"
+    class="bg-stone-100 font-['Segoe_UI',ui-sans-serif,system-ui,sans-serif] text-stone-900 antialiased [text-rendering:optimizeLegibility] selection:bg-orange-100 selection:text-stone-900"
+>
+    <head>
+        <meta charset="utf-8" />
+        <link rel="icon" type="image/svg+xml" href={faviconSvg} />
+        <link rel="icon" href={faviconIco} />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="generator" content={Astro.generator} />
+        <title>{pageTitle}</title>
+        <ClientRouter />
+    </head>
+    <body
+        class="m-0 min-h-dvh overflow-hidden bg-stone-100 text-stone-900"
+        data-prev={prev?.path ?? ""}
+        data-next={next?.path ?? ""}
+        data-home={homePath}
+    >
+        <SlideNav prevHref={prev?.path} nextHref={next?.path} index={index} total={total} />
+
+        <main class="flex min-h-dvh items-center justify-center px-20 py-16 md:px-28">
+            <div
+                class="w-full max-w-6xl"
+                transition:name={isOpeningSlide ? "presentation-hosting-at-home" : undefined}
+                transition:animate={!isOpeningSlide ? slide({ duration: "350ms" }) : undefined}
+            >
+                <slot />
+            </div>
+        </main>
+
+        <script>
+            import { navigate } from "astro:transitions/client";
+            import type { TransitionBeforePreparationEvent } from "astro:transitions/client";
+            import { getSlideIndex } from "./deck";
+
+            function go(direction: "prev" | "next") {
+                const href = document.body.dataset[direction];
+                if (href) navigate(href);
+            }
+
+            function onKeydown(event: KeyboardEvent) {
+                if (event.metaKey || event.ctrlKey || event.altKey) return;
+                const target = event.target as HTMLElement | null;
+                if (
+                    target &&
+                    (target.isContentEditable ||
+                        target.tagName === "INPUT" ||
+                        target.tagName === "TEXTAREA" ||
+                        target.tagName === "SELECT")
+                ) {
+                    return;
+                }
+
+                switch (event.key) {
+                    case "ArrowRight":
+                    case "ArrowDown":
+                    case "d":
+                    case "D":
+                    case " ":
+                    case "PageDown":
+                        event.preventDefault();
+                        go("next");
+                        break;
+                    case "ArrowLeft":
+                    case "ArrowUp":
+                    case "a":
+                    case "A":
+                    case "PageUp":
+                        event.preventDefault();
+                        go("prev");
+                        break;
+                    case "Home":
+                        event.preventDefault();
+                        navigate(document.body.dataset.home || "/");
+                        break;
+                }
+            }
+
+            function onBeforePreparation(event: Event) {
+                const prep = event as TransitionBeforePreparationEvent;
+                if (prep.navigationType === "traverse") return;
+
+                const fromIndex = getSlideIndex(prep.from.pathname);
+                const toIndex = getSlideIndex(prep.to.pathname);
+                if (fromIndex === -1 || toIndex === -1 || fromIndex === toIndex) return;
+
+                prep.direction = toIndex < fromIndex ? "back" : "forward";
+            }
+
+            if (!(window as Window & { __deckNav?: boolean }).__deckNav) {
+                (window as Window & { __deckNav?: boolean }).__deckNav = true;
+                window.addEventListener("keydown", onKeydown);
+                document.addEventListener("astro:before-preparation", onBeforePreparation);
+            }
+        </script>
+    </body>
+</html>

@@ -1,0 +1,23 @@
+---
+import SlideLayout from "../../../components/presentations/hosting-at-home/SlideLayout.astro";
+import AuthorSlide from "../../../components/presentations/hosting-at-home/AuthorSlide.astro";
+import { withBase } from "../../../components/presentations/hosting-at-home/deck";
+---
+
+<SlideLayout title="About the Author">
+    <AuthorSlide
+        name="Daniel Cluff"
+        role="Software Engineer"
+        image={withBase("/presentations/hosting-at-home/me.jpg")}
+        links={[
+            { label: "Danielcluff.com", href: "https://danielcluff.com" },
+            { label: "GitHub.com/danielcluff", href: "https://github.com/danielcluff" },
+        ]}
+    >
+        <p><strong>Work:</strong> GenAI Learning building writegrader.com</p>
+        <p><strong>Learning:</strong> Systems design, DevOps, and gamedev</p>
+        <p>
+            <strong>Interests:</strong> Making a multiplayer arcade space sim, anime, and cooking
+        </p>
+    </AuthorSlide>
+</SlideLayout>

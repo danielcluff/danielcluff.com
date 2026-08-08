@@ -1,0 +1,17 @@
+---
+import SlideLayout from "../../../components/presentations/hosting-at-home/SlideLayout.astro";
+import ContentSlide from "../../../components/presentations/hosting-at-home/ContentSlide.astro";
+---
+
+<SlideLayout title="Hardening">
+    <ContentSlide title="Secure Cloudflare" eyebrow="Hardening part 2">
+        <ul>
+            <li>Enable <strong>WAF managed rules</strong> for your hostname</li>
+            <li>Set up <strong>rate limiting</strong> rules for login endpoints</li>
+            <li>
+                Use <strong>Cloudflare Access</strong> to put SSO/MFA in front of anything semi-private
+            </li>
+            <li>Turn on <strong>Bot Fight Mode</strong> in your zone settings</li>
+        </ul>
+    </ContentSlide>
+</SlideLayout>

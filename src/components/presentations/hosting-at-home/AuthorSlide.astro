@@ -1,0 +1,69 @@
+---
+interface Props {
+  name: string;
+  role?: string;
+  image?: string;
+  links?: { label: string; href: string }[];
+}
+
+const { name, role, image, links = [] } = Astro.props;
+const initials = name
+  .split(/\s+/)
+  .filter(Boolean)
+  .slice(0, 2)
+  .map((part) => part[0]?.toUpperCase() ?? '')
+  .join('');
+---
+
+<section class="flex min-h-[70dvh] flex-col justify-center gap-10">
+  <p class="text-[clamp(1.125rem,1.5vw,1.375rem)] font-semibold tracking-[0.14em] text-orange-600 uppercase">
+    About the author
+  </p>
+
+  <div class="grid items-center gap-10 md:grid-cols-[auto_1fr] md:gap-14">
+    {
+      image ? (
+        <img
+          src={image}
+          alt={name}
+          class="h-40 w-40 rounded-full object-cover ring-4 ring-orange-100 md:h-48 md:w-48"
+        />
+      ) : (
+        <div
+          class="flex h-40 w-40 items-center justify-center rounded-full bg-orange-100 text-5xl font-semibold text-orange-600 md:h-48 md:w-48 md:text-6xl"
+          aria-hidden="true"
+        >
+          {initials}
+        </div>
+      )
+    }
+
+    <div class="space-y-6">
+      <div class="space-y-2">
+        <h1 class="text-[clamp(2.75rem,4.5vw,4rem)] leading-tight font-semibold tracking-tight">{name}</h1>
+        {role ? <p class="text-[clamp(1.75rem,2.5vw,2.25rem)] text-stone-600">{role}</p> : null}
+      </div>
+
+      <div class="max-w-3xl space-y-5 text-[clamp(1.5rem,2.1vw,2rem)] leading-relaxed text-stone-600">
+        <slot />
+      </div>
+
+      {
+        links.length > 0 ? (
+          <ul class="flex flex-wrap gap-x-8 gap-y-3 pt-2 text-[clamp(1.125rem,1.5vw,1.375rem)]">
+            {links.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  class="font-medium text-orange-600 underline decoration-orange-600/30 underline-offset-4 transition-colors hover:decoration-orange-600"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : null
+      }
+    </div>
+  </div>
+</section>

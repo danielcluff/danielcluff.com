@@ -1,0 +1,17 @@
+---
+import SlideLayout from "../../../components/presentations/hosting-at-home/SlideLayout.astro";
+import ContentSlide from "../../../components/presentations/hosting-at-home/ContentSlide.astro";
+---
+
+<SlideLayout title="Homelab">
+    <ContentSlide title="My k8s homelab" eyebrow="Kubernetes">
+        <ul>
+            <li>3 Node setup with Beelink mini-pcs</li>
+            <li>Talos Linux</li>
+            <li>MetalLB load balancing</li>
+            <li>Ingress with Traefik</li>
+            <li>Longhorn for storage</li>
+            <li>Tailscale for remote access</li>
+        </ul>
+    </ContentSlide>
+</SlideLayout>
