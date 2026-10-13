@@ -18,7 +18,7 @@ const socials = [{ name: "GitHub", href: "https://www.github.com/danielcluff" },
             <nav aria-label="Main navigation" class="flex flex-wrap items-center gap-x-7 gap-y-3 text-xs font-semibold md:text-sm">
                 <a class="nav-link" href="#work">Work</a>
                 <a class="nav-link" href="/presentations">Presentations</a>
-                <a class="nav-link" href="/daniel-cluff-resume.pdf" target="_blank" rel="noopener noreferrer">Résumé <ArrowIcon /></a>
+                <a class="nav-link" href="/daniel-cluff-resume.pdf" target="_blank" rel="noopener noreferrer">Résumé <ArrowIcon class="relative -top-[2px] size-4" /></a>
             </nav>
         </header>
         </div>
@@ -33,12 +33,12 @@ const socials = [{ name: "GitHub", href: "https://www.github.com/danielcluff" },
                         <circle cx="100" cy="100" r="26" class="fill-sky-500" />
                     </svg>
                 </div>
-                <div class="mt-12 grid gap-8 border-t border-[#171717]/35 pt-7 md:mt-16 md:grid-cols-[1fr_1fr_auto] md:items-end">
+                <div class="mt-24 grid gap-8 md:mt-32 md:grid-cols-[1fr_1fr_auto] md:items-end">
                     <p class="max-w-sm text-xl leading-snug font-medium md:text-2xl">Thoughtful interfaces.<br />Useful software.</p>
-                    <p class="max-w-xs text-sm leading-7 text-[#171717]/85">TypeScript / React / AWS<br />SQL / Python</p>
-                    <a href="#work" class="group flex items-center gap-5 text-sm font-semibold text-neutral-900 hover:text-neutral-900">Explore my work <span aria-hidden="true" class="flex h-12 w-12 items-center justify-center rounded-full border border-[#171717]/60 text-xl transition-colors group-hover:border-rose-500 group-hover:bg-rose-500 group-hover:text-neutral-900"><ArrowIcon direction="down" class="size-5" /></span></a>
+                    <p class="max-w-xs text-sm leading-7 text-[#171717]/85">TypeScript, Go, Zig<br />React, Svelte, Solid<br />Kubernetes, AWS</p>
+                    <a href="#work" class="group flex items-center gap-5 text-sm font-semibold text-neutral-900 hover:text-neutral-900">Explore my work <span aria-hidden="true" class="flex h-12 w-12 items-center justify-center rounded-full text-xl transition-colors group-hover:bg-rose-500 group-hover:text-neutral-900"><ArrowIcon direction="down" class="size-5" /></span></a>
                 </div>
-                <div class="mt-8 flex flex-wrap gap-6 text-sm">{socials.map(social => <a class="border-b border-[#171717]/40 pb-1 hover:border-[#171717]" href={social.href} target="_blank" rel="noopener noreferrer">{social.name} <ArrowIcon class="ml-2 size-4" /></a>)}</div>
+                <div class="mt-8 flex flex-wrap gap-6 text-sm">{socials.map(social => <a class="pb-1" href={social.href} target="_blank" rel="noopener noreferrer">{social.name} <ArrowIcon class="relative -top-[2px] ml-2 size-4" /></a>)}</div>
             </section>
         </div>
             <div class="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-16">
