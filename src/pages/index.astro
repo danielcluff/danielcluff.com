@@ -33,10 +33,10 @@ const socials = [{ name: "GitHub", href: "https://www.github.com/danielcluff" },
                         <circle cx="100" cy="100" r="26" class="fill-sky-500" />
                     </svg>
                 </div>
-                <div class="mt-24 grid gap-8 md:mt-32 md:grid-cols-[1fr_1fr_auto] md:items-end">
+                <div class="mt-24 grid gap-8 md:mt-32 md:grid-cols-[1fr_1fr_auto] md:items-start">
                     <p class="max-w-sm text-xl leading-snug font-medium md:text-2xl">Thoughtful interfaces.<br />Useful software.</p>
-                    <p class="max-w-xs text-sm leading-7 text-[#171717]/85">TypeScript, Go, Zig<br />React, Svelte, Solid<br />Kubernetes, AWS</p>
-                    <a href="#work" class="group flex items-center gap-5 text-sm font-semibold text-neutral-900 hover:text-neutral-900">Explore my work <span aria-hidden="true" class="flex h-12 w-12 items-center justify-center rounded-full text-xl transition-colors group-hover:bg-rose-500 group-hover:text-neutral-900"><ArrowIcon direction="down" class="size-5" /></span></a>
+                    <p class="max-w-xs text-sm leading-7 text-[#171717]/85">TypeScript / Go / Zig<br />React / Svelte / Solid<br />Kubernetes / AWS</p>
+                    <a href="#work" class="group flex items-center gap-5 text-sm font-semibold text-neutral-900 hover:text-neutral-900 md:self-center">Explore my work <span aria-hidden="true" class="flex h-12 w-12 items-center justify-center rounded-full text-xl transition-colors group-hover:bg-rose-500 group-hover:text-neutral-900"><ArrowIcon direction="down" class="size-5" /></span></a>
                 </div>
                 <div class="mt-8 flex flex-wrap gap-6 text-sm">{socials.map(social => <a class="pb-1" href={social.href} target="_blank" rel="noopener noreferrer">{social.name} <ArrowIcon class="relative -top-[2px] ml-2 size-4" /></a>)}</div>
             </section>
