@@ -1,0 +1,29 @@
+---
+import Layout from "./Layout.astro";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+interface Props {
+    title: string;
+    headerTone?: "sky" | "dark";
+}
+const { title, headerTone = "dark" } = Astro.props;
+---
+<Layout title={title} bgColor="bg-neutral-900">
+    <div class="site-shell min-h-screen bg-neutral-900 text-neutral-100 selection:bg-rose-500 selection:text-neutral-900">
+        <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-6 focus:top-4 focus:z-50 focus:bg-rose-500 focus:p-3 focus:text-black">Skip to content</a>
+        <SiteHeader tone={headerTone} />
+        <slot />
+        <SiteFooter />
+    </div>
+</Layout>
+<style>
+    .site-shell { font-family: Arial, Helvetica, sans-serif; }
+    /* Scale the complete site shell at 4K-class viewport widths (CSS pixels). */
+    @media (min-width: 3200px) {
+        .site-shell { zoom: 2; }
+    }
+    .site-shell :global(a:focus-visible) { outline: 2px solid var(--color-rose-500); outline-offset: 6px; }
+    .site-shell :global(.bg-sky-500 a:focus-visible) { outline-color: #171717; }
+    .site-shell :global(aside a:focus-visible) { outline-color: #321c20; }
+    @media (prefers-reduced-motion: reduce) { .site-shell :global(*) { transition: none !important; } }
+</style>

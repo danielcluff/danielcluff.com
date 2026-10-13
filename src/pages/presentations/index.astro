@@ -1,16 +1,14 @@
 ---
-import Layout from "../../layouts/Layout.astro";
-import PresentationHeader from "../../components/PresentationHeader.astro";
-import PresentationFooter from "../../components/PresentationFooter.astro";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import ArrowIcon from "../../components/ArrowIcon.astro";
 import { presentations } from "../../data/presentations";
 import PresentationPreview from "../../components/presentations/hosting-at-home/PresentationPreview.astro";
 ---
 
-<Layout title="Presentations | Daniel Cluff" bgColor="bg-zinc-950 text-white">
-    <PresentationHeader />
-    <main class="mx-auto max-w-6xl px-4 presentations-page md:px-6">
+<SiteLayout title="Presentations | Daniel Cluff">
+    <main id="main" class="presentations-page mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-16">
         <section class="intro">
-            <p class="eyebrow accent">Selected talks</p>
+            <p class="eyebrow text-rose-500">Selected talks</p>
             <h1>Presentations</h1>
             <p class="lede">
                 Notes, experiments, and practical ideas in a format you can explore at your own
@@ -32,7 +30,7 @@ import PresentationPreview from "../../components/presentations/hosting-at-home/
                         >
                             <PresentationPreview />
                             <span class="open-label">
-                                Open deck <span aria-hidden="true">↗</span>
+                                Open deck <ArrowIcon class="ml-1 size-4" />
                             </span>
                         </div>
                         <div class="presentation-copy">
@@ -46,8 +44,7 @@ import PresentationPreview from "../../components/presentations/hosting-at-home/
             }
         </section>
     </main>
-    <PresentationFooter />
-</Layout>
+</SiteLayout>
 
 <style>
     .presentations-page {

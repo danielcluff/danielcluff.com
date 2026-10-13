@@ -1,0 +1,18 @@
+---
+import ArrowIcon from "./ArrowIcon.astro";
+interface Props { tone?: "sky" | "dark"; }
+const { tone = "dark" } = Astro.props;
+---
+        <div class:list={[tone === "sky" ? "bg-sky-500 text-neutral-900" : "bg-neutral-900 text-neutral-100"]}>
+        <header class="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-5 px-6 py-7 sm:px-10 lg:px-16">
+            <a href="/" aria-label="Daniel Cluff home" class="text-3xl font-black tracking-[-0.09em]">dc<span class="text-rose-500">.</span></a>
+            <nav aria-label="Main navigation" class="flex flex-wrap items-center gap-x-7 gap-y-3 text-xs font-semibold md:text-sm">
+                <a class="nav-link" href={Astro.url.pathname === "/" ? "#work" : "/#work"}>Work</a>
+                <a class="nav-link" href="/presentations">Presentations</a>
+                <a class="nav-link" href="/daniel-cluff-resume.pdf" target="_blank" rel="noopener noreferrer">Résumé <ArrowIcon class="relative -top-[1px] size-4" /></a>
+            </nav>
+        </header>
+        </div>
+<style>
+    .nav-link:hover { text-decoration: underline; text-underline-offset: 5px; }
+</style>

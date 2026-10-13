@@ -1,6 +1,6 @@
 ---
 import ArrowIcon from "../components/ArrowIcon.astro";
-import Layout from "../layouts/Layout.astro";
+import SiteLayout from "../layouts/SiteLayout.astro";
 const projects = [
     { title: "WriteGrader", category: "Web platform", href: "https://writegrader.com", link: "WriteGrader.com", image: "/writegrader.svg", alt: "WriteGrader logo", skills: "TypeScript · Zig · Svelte · TailwindCSS · SQL · AWS", paragraphs: ["Migrated Zod to Valibot, cutting package size by 15% and app bundles by 2.5–4%.", "Built a reusable data table framework with search, sorting, and saved preferences across ~20 views.", "Led frontend development of a customer-facing CMS with Svelte, API integration, and responsive layouts."] },
     { title: "GW2 Identified", category: "Full-stack application", href: "https://identified.elate.biz", link: "GW2 Identified", image: "/identified.jpg", alt: "GW2 Identified", skills: "Python · Flask · SQL · Docker · AWS", paragraphs: ["GW2 Inventory tool to track and display item processing returns.", "Full-stack app made with Flask and Chart.js deployed to AWS with Docker."] },
@@ -9,19 +9,7 @@ const projects = [
 ];
 const socials = [{ name: "GitHub", href: "https://www.github.com/danielcluff" }, { name: "LinkedIn", href: "https://www.linkedin.com/in/danielcluff" }, { name: "X", href: "https://www.x.com/danielcluff" }];
 ---
-<Layout title="Daniel Cluff — Software Developer" bgColor="bg-[#171717]">
-    <div class="editorial min-h-screen bg-[#171717] text-neutral-100 selection:bg-rose-500 selection:text-[#171717]">
-        <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-6 focus:top-4 focus:z-50 focus:bg-rose-500 focus:p-3 focus:text-black">Skip to content</a>
-        <div class="bg-sky-500 text-[#171717]">
-        <header class="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-5 px-6 py-7 sm:px-10 lg:px-16">
-            <a href="/" aria-label="Daniel Cluff home" class="text-3xl font-black tracking-[-0.09em]">dc<span class="text-rose-500">.</span></a>
-            <nav aria-label="Main navigation" class="flex flex-wrap items-center gap-x-7 gap-y-3 text-xs font-semibold md:text-sm">
-                <a class="nav-link" href="#work">Work</a>
-                <a class="nav-link" href="/presentations">Presentations</a>
-                <a class="nav-link" href="/daniel-cluff-resume.pdf" target="_blank" rel="noopener noreferrer">Résumé <ArrowIcon class="relative -top-[1px] size-4" /></a>
-            </nav>
-        </header>
-        </div>
+<SiteLayout title="Daniel Cluff — Software Developer" headerTone="sky">
         <main id="main">
         <div class="bg-sky-500 text-[#171717]">
             <section class="relative mx-auto max-w-[1440px] px-6 pt-14 pb-12 sm:px-10 md:pt-20 lg:px-16 lg:pt-24">
@@ -53,18 +41,4 @@ const socials = [{ name: "GitHub", href: "https://www.github.com/danielcluff" },
             <aside class="my-10 grid gap-6 rounded-sm bg-rose-500 px-7 py-9 text-[#321c20] sm:my-16 sm:grid-cols-[1fr_auto] sm:items-center sm:px-10"><div><p class="font-mono text-[10px] uppercase tracking-[0.2em]">Away from the keyboard</p><h2 class="mt-3 text-3xl font-medium tracking-[-0.045em]">A little room to stretch.</h2></div><a href="/stretchtimer" class="w-fit rounded-full border border-[#321c20]/40 px-6 py-3 text-sm transition-colors hover:bg-[#321c20] hover:text-rose-500">Open Stretch Timer <ArrowIcon class="ml-4 size-4" /></a></aside>
             </div>
         </main>
-        <footer class="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-5 border-t border-white/15 px-6 py-8 text-xs text-neutral-400 sm:px-10 lg:px-16"><p>© DanielCluff.com</p><p>Made with Astro & Tailwind CSS</p><a href="#main" class="hover:text-rose-500">Back to top <ArrowIcon direction="up" class="ml-2 size-4" /></a></footer>
-    </div>
-</Layout>
-<style>
-    .editorial { font-family: Arial, Helvetica, sans-serif; }
-    /* Scale the full homepage at 4K-class viewport widths (CSS pixels). */
-    @media (min-width: 3200px) {
-        .editorial { zoom: 2; }
-    }
-    .nav-link:hover { text-decoration: underline; text-underline-offset: 5px; }
-    .editorial :global(a:focus-visible) { outline: 2px solid var(--color-rose-500); outline-offset: 6px; }
-    .editorial :global(.bg-sky-500 a:focus-visible) { outline-color: #171717; }
-    .editorial aside a:focus-visible { outline-color: #321c20; }
-    @media (prefers-reduced-motion: reduce) { .editorial :global(*) { transition: none !important; } }
-</style>
+</SiteLayout>
