@@ -1,0 +1,16 @@
+---
+// Heroicons 24px outline icons, MIT licensed by Tailwind Labs.
+interface Props {
+    direction?: "up-right" | "down" | "up";
+    class?: string;
+}
+const { direction = "up-right", class: className = "size-4" } = Astro.props;
+const paths = {
+    "up-right": "m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25",
+    down: "M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3",
+    up: "M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18",
+};
+---
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" focusable="false" class:list={["inline-block shrink-0 align-middle", className]}>
+    <path stroke-linecap="round" stroke-linejoin="round" d={paths[direction]} />
+</svg>

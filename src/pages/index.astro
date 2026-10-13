@@ -1,4 +1,5 @@
 ---
+import ArrowIcon from "../components/ArrowIcon.astro";
 import Layout from "../layouts/Layout.astro";
 const projects = [
     { title: "WriteGrader", category: "Web platform", href: "https://writegrader.com", link: "WriteGrader.com", image: "/writegrader.svg", alt: "WriteGrader logo", skills: "TypeScript · Zig · Svelte · TailwindCSS · SQL · AWS", paragraphs: ["Migrated Zod to Valibot, cutting package size by 15% and app bundles by 2.5–4%.", "Built a reusable data table framework with search, sorting, and saved preferences across ~20 views.", "Led frontend development of a customer-facing CMS with Svelte, API integration, and responsive layouts."] },
@@ -12,18 +13,18 @@ const socials = [{ name: "GitHub", href: "https://www.github.com/danielcluff" },
     <div class="editorial min-h-screen bg-[#171717] text-neutral-100 selection:bg-rose-500 selection:text-[#171717]">
         <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-6 focus:top-4 focus:z-50 focus:bg-rose-500 focus:p-3 focus:text-black">Skip to content</a>
         <div class="bg-sky-500 text-[#171717]">
-        <header class="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-5 px-6 py-7 md:px-12 lg:px-20">
+        <header class="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-5 px-6 py-7 sm:px-10 lg:px-16">
             <a href="/" aria-label="Daniel Cluff home" class="text-3xl font-black tracking-[-0.09em]">dc<span class="text-rose-500">.</span></a>
             <nav aria-label="Main navigation" class="flex flex-wrap items-center gap-x-7 gap-y-3 text-xs font-semibold md:text-sm">
                 <a class="nav-link" href="#work">Work</a>
                 <a class="nav-link" href="/presentations">Presentations</a>
-                <a class="nav-link" href="/daniel-cluff-resume.pdf" target="_blank" rel="noopener noreferrer">Résumé <span aria-hidden="true">↗</span></a>
+                <a class="nav-link" href="/daniel-cluff-resume.pdf" target="_blank" rel="noopener noreferrer">Résumé <ArrowIcon /></a>
             </nav>
         </header>
         </div>
         <main id="main">
         <div class="bg-sky-500 text-[#171717]">
-            <section class="relative mx-auto max-w-[1600px] px-6 pt-14 pb-12 md:px-12 md:pt-20 lg:px-20 lg:pt-24">
+            <section class="relative mx-auto max-w-[1440px] px-6 pt-14 pb-12 sm:px-10 md:pt-20 lg:px-16 lg:pt-24">
                 <p class="mb-6 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.18em]"><span class="h-2 w-2 rounded-full bg-rose-500"></span> Software developer</p>
                 <div class="relative">
                     <h1 class="relative z-10 max-w-5xl text-[clamp(5rem,13vw,12.5rem)] leading-[0.85] font-bold tracking-[-0.085em]">Daniel<br />Cluff<span class="text-rose-500">.</span></h1>
@@ -35,9 +36,9 @@ const socials = [{ name: "GitHub", href: "https://www.github.com/danielcluff" },
                 <div class="mt-12 grid gap-8 border-t border-[#171717]/35 pt-7 md:mt-16 md:grid-cols-[1fr_1fr_auto] md:items-end">
                     <p class="max-w-sm text-xl leading-snug font-medium md:text-2xl">Thoughtful interfaces.<br />Useful software.</p>
                     <p class="max-w-xs text-sm leading-7 text-[#171717]/85">TypeScript / React / AWS<br />SQL / Python</p>
-                    <a href="#work" class="group flex items-center gap-5 text-sm font-semibold text-neutral-900 hover:text-neutral-900">Explore my work <span aria-hidden="true" class="flex h-12 w-12 items-center justify-center rounded-full border border-[#171717]/60 text-xl transition-colors group-hover:border-neutral-900 group-hover:bg-neutral-900 group-hover:text-sky-500">↓</span></a>
+                    <a href="#work" class="group flex items-center gap-5 text-sm font-semibold text-neutral-900 hover:text-neutral-900">Explore my work <span aria-hidden="true" class="flex h-12 w-12 items-center justify-center rounded-full border border-[#171717]/60 text-xl transition-colors group-hover:border-rose-500 group-hover:bg-rose-500 group-hover:text-neutral-900"><ArrowIcon direction="down" class="size-5" /></span></a>
                 </div>
-                <div class="mt-8 flex flex-wrap gap-6 text-sm">{socials.map(social => <a class="border-b border-[#171717]/40 pb-1 hover:border-[#171717]" href={social.href} target="_blank" rel="noopener noreferrer">{social.name} <span aria-hidden="true" class="ml-2">↗</span></a>)}</div>
+                <div class="mt-8 flex flex-wrap gap-6 text-sm">{socials.map(social => <a class="border-b border-[#171717]/40 pb-1 hover:border-[#171717]" href={social.href} target="_blank" rel="noopener noreferrer">{social.name} <ArrowIcon class="ml-2 size-4" /></a>)}</div>
             </section>
         </div>
             <div class="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-16">
@@ -45,14 +46,14 @@ const socials = [{ name: "GitHub", href: "https://www.github.com/danielcluff" },
                 <div class="flex flex-wrap items-end justify-between gap-4 pb-8 pt-16 md:pt-24"><h2 id="work-heading" class="text-4xl font-bold tracking-[-0.055em] md:text-6xl">Selected work<span class="text-rose-500">.</span></h2><span class="font-mono text-xs text-neutral-400">01 — {String(projects.length).padStart(2, "0")}</span></div>
                 {projects.map((project, index) => <article class:list={["grid gap-7 border-white/15 py-10 lg:grid-cols-[40px_0.75fr_1fr] lg:gap-8 lg:py-12", index > 0 && "border-t"]}>
                     <span class="font-mono text-xs text-neutral-400">0{index + 1}</span>
-                    <div><p class="mb-4 font-mono text-[10px] uppercase tracking-[0.15em] text-neutral-400">{project.category}</p><h3 class="text-3xl font-medium tracking-[-0.045em] sm:text-4xl"><a href={project.href} target="_blank" rel="noopener noreferrer" class="group inline-flex items-center gap-4 transition-colors hover:text-rose-500">{project.title}<span aria-hidden="true" class="text-xl text-rose-500 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1">↗</span></a></h3><img src={project.image} alt={project.alt} width="160" height="160" loading="lazy" class="mt-8 size-40 rounded-lg bg-neutral-100 object-contain" /></div>
-                    <div class="lg:pt-1"><div class="space-y-3 text-base leading-[1.8] text-neutral-300">{project.paragraphs.map(paragraph => <p>{paragraph}</p>)}</div><p class="mt-7 font-mono text-[10px] leading-loose text-neutral-400">{project.skills}</p><a href={project.href} target="_blank" rel="noopener noreferrer" class="mt-7 inline-flex items-center gap-3 border-b border-rose-500/50 pb-1 text-xs text-rose-500 transition-colors hover:border-rose-500">{project.link} <span aria-hidden="true">↗</span></a></div>
+                    <div><p class="mb-4 font-mono text-[10px] uppercase tracking-[0.15em] text-neutral-400">{project.category}</p><h3 class="text-3xl font-medium tracking-[-0.045em] sm:text-4xl"><a href={project.href} target="_blank" rel="noopener noreferrer" class="group inline-flex items-center gap-4 transition-colors hover:text-rose-500">{project.title}<ArrowIcon class="size-5 text-rose-500 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1" /></a></h3><img src={project.image} alt={project.alt} width="160" height="160" loading="lazy" class="mt-8 size-40 rounded-lg bg-neutral-100 object-contain" /></div>
+                    <div class="lg:pt-1"><div class="space-y-3 text-base leading-[1.8] text-neutral-300">{project.paragraphs.map(paragraph => <p>{paragraph}</p>)}</div><p class="mt-7 font-mono text-[10px] leading-loose text-neutral-400">{project.skills}</p><a href={project.href} target="_blank" rel="noopener noreferrer" class="mt-7 inline-flex items-center gap-3 border-b border-rose-500/50 pb-1 text-xs text-rose-500 transition-colors hover:border-rose-500">{project.link} <ArrowIcon /></a></div>
                 </article>)}
             </section>
-            <aside class="my-10 grid gap-6 rounded-sm bg-rose-500 px-7 py-9 text-[#321c20] sm:my-16 sm:grid-cols-[1fr_auto] sm:items-center sm:px-10"><div><p class="font-mono text-[10px] uppercase tracking-[0.2em]">Away from the keyboard</p><h2 class="mt-3 text-3xl font-medium tracking-[-0.045em]">A little room to stretch.</h2></div><a href="/stretchtimer" class="w-fit rounded-full border border-[#321c20]/40 px-6 py-3 text-sm transition-colors hover:bg-[#321c20] hover:text-rose-500">Open Stretch Timer <span class="ml-4" aria-hidden="true">↗</span></a></aside>
+            <aside class="my-10 grid gap-6 rounded-sm bg-rose-500 px-7 py-9 text-[#321c20] sm:my-16 sm:grid-cols-[1fr_auto] sm:items-center sm:px-10"><div><p class="font-mono text-[10px] uppercase tracking-[0.2em]">Away from the keyboard</p><h2 class="mt-3 text-3xl font-medium tracking-[-0.045em]">A little room to stretch.</h2></div><a href="/stretchtimer" class="w-fit rounded-full border border-[#321c20]/40 px-6 py-3 text-sm transition-colors hover:bg-[#321c20] hover:text-rose-500">Open Stretch Timer <ArrowIcon class="ml-4 size-4" /></a></aside>
             </div>
         </main>
-        <footer class="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-5 border-t border-white/15 px-6 py-8 text-xs text-neutral-400 sm:px-10 lg:px-16"><p>© DanielCluff.com</p><p>Made with Astro & Tailwind CSS</p><a href="#main" class="hover:text-rose-500">Back to top ↑</a></footer>
+        <footer class="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-5 border-t border-white/15 px-6 py-8 text-xs text-neutral-400 sm:px-10 lg:px-16"><p>© DanielCluff.com</p><p>Made with Astro & Tailwind CSS</p><a href="#main" class="hover:text-rose-500">Back to top <ArrowIcon direction="up" class="ml-2 size-4" /></a></footer>
     </div>
 </Layout>
 <style>
