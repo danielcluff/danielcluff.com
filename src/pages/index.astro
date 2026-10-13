@@ -58,6 +58,10 @@ const socials = [{ name: "GitHub", href: "https://www.github.com/danielcluff" },
 </Layout>
 <style>
     .editorial { font-family: Arial, Helvetica, sans-serif; }
+    /* Scale the full homepage at 4K-class viewport widths (CSS pixels). */
+    @media (min-width: 3200px) {
+        .editorial { zoom: 2; }
+    }
     .nav-link:hover { text-decoration: underline; text-underline-offset: 5px; }
     .editorial :global(a:focus-visible) { outline: 2px solid var(--color-rose-500); outline-offset: 6px; }
     .editorial :global(.bg-sky-500 a:focus-visible) { outline-color: #171717; }
