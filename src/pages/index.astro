@@ -1,92 +1,66 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Header from "../layouts/Header.astro";
-import Footer from "../layouts/Footer.astro";
-import Work from "../components/Work.astro";
-import "@picocss/pico";
+const projects = [
+    { title: "WriteGrader", category: "Web platform", href: "https://writegrader.com", link: "WriteGrader.com", image: "/writegrader.svg", alt: "WriteGrader logo", skills: "TypeScript · Zig · Svelte · TailwindCSS · SQL · AWS", paragraphs: ["Migrated Zod to Valibot, cutting package size by 15% and app bundles by 2.5–4%.", "Built a reusable data table framework with search, sorting, and saved preferences across ~20 views.", "Led frontend development of a customer-facing CMS with Svelte, API integration, and responsive layouts."] },
+    { title: "GW2 Identified", category: "Full-stack application", href: "https://identified.elate.biz", link: "GW2 Identified", image: "/identified.jpg", alt: "GW2 Identified", skills: "Python · Flask · SQL · Docker · AWS", paragraphs: ["GW2 Inventory tool to track and display item processing returns.", "Full-stack app made with Flask and Chart.js deployed to AWS with Docker."] },
+    { title: "Ponder", category: "iOS application", href: "https://apps.apple.com/us/app/ponder-prayer-companion/id6737998473", link: "Ponder on the App Store", image: "/ponder.jpg", alt: "Ponder", skills: "TypeScript · React Native · MMKV · iOS", paragraphs: ["Designed and developed a prayer companion to-do list app."] },
+    { title: "Start Booking", category: "Web platform", href: "https://www.startbooking.com", link: "StartBooking.com", image: "/startbooking.jpg", alt: "Start Booking", skills: "React · Redux · JavaScript · TailwindCSS · PHP · Laravel", paragraphs: ["Worked as Frontend developer building new features and migrating old codebase to React.", "Created component library as npm package for use across multiple code repositories.", "Migrated calendar package to Full Calendar."] },
+];
+const socials = [{ name: "GitHub", href: "https://www.github.com/danielcluff" }, { name: "LinkedIn", href: "https://www.linkedin.com/in/danielcluff" }, { name: "X", href: "https://www.x.com/danielcluff" }];
 ---
-
-<Layout title="Daniel Cluff">
-    <Header />
-    <main class="container">
-        <section>
-            <h1>Hi, I'm <span class="accent">Daniel</span></h1>
-            <h3>SOFTWARE DEVELOPER</h3>
-            <p class="accent">TypeScript • React • AWS • SQL • Python</p>
-            <div>
-                <a href="https://www.github.com/danielcluff" target="_blank" class="secondary">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="social"
-                        ><path
-                            d="M12.001 2C6.47598 2 2.00098 6.475 2.00098 12C2.00098 16.425 4.86348 20.1625 8.83848 21.4875C9.33848 21.575 9.52598 21.275 9.52598 21.0125C9.52598 20.775 9.51348 19.9875 9.51348 19.15C7.00098 19.6125 6.35098 18.5375 6.15098 17.975C6.03848 17.6875 5.55098 16.8 5.12598 16.5625C4.77598 16.375 4.27598 15.9125 5.11348 15.9C5.90098 15.8875 6.46348 16.625 6.65098 16.925C7.55098 18.4375 8.98848 18.0125 9.56348 17.75C9.65098 17.1 9.91348 16.6625 10.201 16.4125C7.97598 16.1625 5.65098 15.3 5.65098 11.475C5.65098 10.3875 6.03848 9.4875 6.67598 8.7875C6.57598 8.5375 6.22598 7.5125 6.77598 6.1375C6.77598 6.1375 7.61348 5.875 9.52598 7.1625C10.326 6.9375 11.176 6.825 12.026 6.825C12.876 6.825 13.726 6.9375 14.526 7.1625C16.4385 5.8625 17.276 6.1375 17.276 6.1375C17.826 7.5125 17.476 8.5375 17.376 8.7875C18.0135 9.4875 18.401 10.375 18.401 11.475C18.401 15.3125 16.0635 16.1625 13.8385 16.4125C14.201 16.725 14.5135 17.325 14.5135 18.2625C14.5135 19.6 14.501 20.675 14.501 21.0125C14.501 21.275 14.6885 21.5875 15.1885 21.4875C19.259 20.1133 21.9999 16.2963 22.001 12C22.001 6.475 17.526 2 12.001 2Z"
-                        ></path></svg
-                    >
-                </a>
-                <a href="https://www.linkedin.com/in/danielcluff" target="_blank" class="secondary">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="social"
-                        ><path
-                            d="M18.3362 18.339H15.6707V14.1622C15.6707 13.1662 15.6505 11.8845 14.2817 11.8845C12.892 11.8845 12.6797 12.9683 12.6797 14.0887V18.339H10.0142V9.75H12.5747V10.9207H12.6092C12.967 10.2457 13.837 9.53325 15.1367 9.53325C17.8375 9.53325 18.337 11.3108 18.337 13.6245V18.339H18.3362ZM7.00373 8.57475C6.14573 8.57475 5.45648 7.88025 5.45648 7.026C5.45648 6.1725 6.14648 5.47875 7.00373 5.47875C7.85873 5.47875 8.55173 6.1725 8.55173 7.026C8.55173 7.88025 7.85798 8.57475 7.00373 8.57475ZM8.34023 18.339H5.66723V9.75H8.34023V18.339ZM19.6697 3H4.32923C3.59498 3 3.00098 3.5805 3.00098 4.29675V19.7033C3.00098 20.4202 3.59498 21 4.32923 21H19.6675C20.401 21 21.001 20.4202 21.001 19.7033V4.29675C21.001 3.5805 20.401 3 19.6675 3H19.6697Z"
-                        ></path></svg
-                    >
-                </a>
-                <a href="https://www.x.com/danielcluff" target="_blank" class="secondary">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="social"
-                        ><path
-                            d="M18.2048 2.25H21.5128L14.2858 10.51L22.7878 21.75H16.1308L10.9168 14.933L4.95084 21.75H1.64084L9.37084 12.915L1.21484 2.25H8.04084L12.7538 8.481L18.2048 2.25ZM17.0438 19.77H18.8768L7.04484 4.126H5.07784L17.0438 19.77Z"
-                        ></path></svg
-                    >
-                </a>
+<Layout title="Daniel Cluff — Software Developer" bgColor="bg-[#181917]">
+    <div class="editorial min-h-screen bg-[#181917] text-[#f1f0e9] selection:bg-rose-500 selection:text-[#181917]">
+        <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:left-6 focus:top-4 focus:z-50 focus:bg-rose-500 focus:p-3 focus:text-black">Skip to content</a>
+        <div class="bg-sky-500 text-[#181917]">
+        <header class="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-5 px-6 py-7 md:px-12 lg:px-20">
+            <a href="/" aria-label="Daniel Cluff home" class="text-3xl font-black tracking-[-0.09em]">dc<span class="text-rose-500">.</span></a>
+            <nav aria-label="Main navigation" class="flex flex-wrap items-center gap-x-7 gap-y-3 text-xs font-semibold md:text-sm">
+                <a class="nav-link" href="#work">Work</a>
+                <a class="nav-link" href="/presentations">Presentations</a>
+                <a class="nav-link" href="/stretchtimer">Stretch Timer</a>
+                <a class="border border-[#181917]/60 px-4 py-2 transition-colors hover:bg-[#f4f1df] hover:text-[#181917]" href="/daniel-cluff-resume.pdf" target="_blank" rel="noopener noreferrer">Résumé <span aria-hidden="true">↗</span></a>
+            </nav>
+        </header>
+        </div>
+        <main id="main">
+        <div class="bg-sky-500 text-[#181917]">
+            <section class="relative mx-auto max-w-[1600px] px-6 pt-14 pb-12 md:px-12 md:pt-20 lg:px-20 lg:pt-24">
+                <p class="mb-6 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.18em]"><span class="h-2 w-2 rounded-full bg-rose-500"></span> Software developer</p>
+                <div class="relative">
+                    <h1 class="relative z-10 max-w-5xl text-[clamp(5rem,13vw,12.5rem)] leading-[0.85] font-bold tracking-[-0.085em]">Daniel<br />Cluff<span class="text-rose-500">.</span></h1>
+                    <svg aria-hidden="true" viewBox="0 0 200 200" class="absolute right-0 bottom-3 hidden w-[28%] max-w-80 text-rose-500 sm:block">
+                        <path d="M100 0V200M0 100H200M29 29L171 171M29 171L171 29" fill="none" stroke="currentColor" stroke-width="24" />
+                        <circle cx="100" cy="100" r="26" class="fill-sky-500" />
+                    </svg>
+                </div>
+                <div class="mt-12 grid gap-8 border-t border-[#181917]/35 pt-7 md:mt-16 md:grid-cols-[1fr_1fr_auto] md:items-end">
+                    <p class="max-w-sm text-xl leading-snug font-medium md:text-2xl">Thoughtful interfaces.<br />Useful software.</p>
+                    <p class="max-w-xs text-sm leading-7 text-[#181917]/85">TypeScript / React / AWS<br />SQL / Python</p>
+                    <a href="#work" class="group flex items-center gap-5 text-sm font-semibold">Explore my work <span aria-hidden="true" class="flex h-12 w-12 items-center justify-center rounded-full border border-[#181917]/60 text-xl transition-colors group-hover:bg-[#f4f1df] group-hover:text-[#181917]">↓</span></a>
+                </div>
+                <div class="mt-8 flex flex-wrap gap-6 text-sm">{socials.map(social => <a class="border-b border-[#181917]/40 pb-1 hover:border-[#181917]" href={social.href} target="_blank" rel="noopener noreferrer">{social.name} <span aria-hidden="true" class="ml-2">↗</span></a>)}</div>
+            </section>
+        </div>
+            <div class="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-16">
+            <section id="work" aria-labelledby="work-heading" class="scroll-mt-8">
+                <div class="flex items-center justify-between border-t border-white/25 py-6"><h2 id="work-heading" class="text-sm font-medium">Selected work <span class="ml-2 font-mono text-xs text-[#919589]">(04)</span></h2><span aria-hidden="true" class="text-lg text-rose-500">↓</span></div>
+                {projects.map((project, index) => <article class="grid gap-7 border-t border-white/15 py-10 lg:grid-cols-[40px_0.75fr_1fr] lg:gap-8 lg:py-12">
+                    <span class="font-mono text-xs text-[#969b8c]">0{index + 1}</span>
+                    <div><p class="mb-4 font-mono text-[10px] uppercase tracking-[0.15em] text-[#b8bbae]">{project.category}</p><h3 class="text-3xl font-medium tracking-[-0.045em] sm:text-4xl"><a href={project.href} target="_blank" rel="noopener noreferrer" class="group inline-flex items-center gap-4 transition-colors hover:text-rose-500">{project.title}<span aria-hidden="true" class="text-xl text-rose-500 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1">↗</span></a></h3><img src={project.image} alt={project.alt} width="160" height="160" loading="lazy" class="mt-8 size-40 rounded-lg bg-[#f1f0e9] object-contain" /></div>
+                    <div class="lg:pt-1"><div class="space-y-3 text-base leading-[1.8] text-[#c4c7bc]">{project.paragraphs.map(paragraph => <p>{paragraph}</p>)}</div><p class="mt-7 font-mono text-[10px] leading-loose text-[#a1a995]">{project.skills}</p><a href={project.href} target="_blank" rel="noopener noreferrer" class="mt-7 inline-flex items-center gap-3 border-b border-rose-500/50 pb-1 text-xs text-rose-500 transition-colors hover:border-rose-500">{project.link} <span aria-hidden="true">↗</span></a></div>
+                </article>)}
+            </section>
+            <aside class="my-10 grid gap-6 rounded-sm bg-rose-500 px-7 py-9 text-[#321c20] sm:my-16 sm:grid-cols-[1fr_auto] sm:items-center sm:px-10"><div><p class="font-mono text-[10px] uppercase tracking-[0.2em]">Away from the keyboard</p><h2 class="mt-3 text-3xl font-medium tracking-[-0.045em]">A little room to stretch.</h2></div><a href="/stretchtimer" class="w-fit rounded-full border border-[#321c20]/40 px-6 py-3 text-sm transition-colors hover:bg-[#321c20] hover:text-rose-500">Open Stretch Timer <span class="ml-4" aria-hidden="true">↗</span></a></aside>
             </div>
-        </section>
-        <section>
-            <h2>Work</h2>
-            <Work
-                href="https://writegrader.com"
-                linkText="WriteGrader.com"
-                title="WriteGrader"
-                skills="TypeScript • Zig • Svelte • TailwindCSS • SQL • AWS"
-                imageUrl="/writegrader.svg"
-                imageAlt="WriteGrader logo"
-            >
-                Migrated Zod to Valibot, cutting package size by 15% and app bundles by 2.5–4%.<br />
-                Built a reusable data table framework with search, sorting, and saved preferences across ~20 views.<br />
-                Led frontend development of a customer-facing CMS with Svelte, API integration, and responsive layouts.
-            </Work>
-            <Work
-                href="https://identified.elate.biz"
-                linkText="GW2 Identified"
-                title="GW2 Identified"
-                skills="Python • Flask • SQL • Docker • AWS"
-                imageUrl="/identified.jpg"
-                imageAlt="GW2 Identified"
-            >
-                GW2 Inventory tool to track and display item processing returns.<br />
-                Full-stack app made with Flask and Chart.js deployed to AWS with Docker.
-            </Work>
-            <Work
-                href="https://apps.apple.com/us/app/ponder-prayer-companion/id6737998473"
-                linkText="Ponder on the AppStore"
-                title="Ponder"
-                skills="TypeScript • React Native • MMKV • iOS"
-                imageUrl="/ponder.jpg"
-                imageAlt="Ponder"
-            >
-                Designed and developed a prayer companion to-do list app.
-            </Work>
-            <Work
-                href="https://www.startbooking.com"
-                linkText="StartBooking.com"
-                title="Start Booking"
-                skills="React • Redux • JavaScript • TailwindCSS • PHP • Laravel"
-                imageUrl="/startbooking.jpg"
-                imageAlt="Start Booking"
-            >
-                Worked as Frontend developer building new features and migrating old codebase to
-                React.<br />
-                Created component library as npm package for use across multiple code repositories.<br
-                />
-                Migrated calendar package to Full Calendar.
-            </Work>
-        </section>
-    </main>
-    <Footer />
+        </main>
+        <footer class="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-5 border-t border-white/15 px-6 py-8 text-xs text-[#a9ae9f] sm:px-10 lg:px-16"><p>© DanielCluff.com</p><p>Made with Astro & Tailwind CSS</p><a href="#main" class="hover:text-rose-500">Back to top ↑</a></footer>
+    </div>
 </Layout>
+<style>
+    .editorial { font-family: Arial, Helvetica, sans-serif; }
+    .nav-link:hover { text-decoration: underline; text-underline-offset: 5px; }
+    .editorial :global(a:focus-visible) { outline: 2px solid var(--color-rose-500); outline-offset: 6px; }
+    .editorial :global(.bg-sky-500 a:focus-visible) { outline-color: #181917; }
+    .editorial aside a:focus-visible { outline-color: #321c20; }
+    @media (prefers-reduced-motion: reduce) { .editorial :global(*) { transition: none !important; } }
+</style>
