@@ -1,0 +1,16 @@
+---
+import ShipScene from './ShipScene';
+---
+<div class="ship-hologram" aria-hidden="true">
+    <ShipScene client:visible />
+</div>
+<style>
+    .ship-hologram { position: absolute; right: -2%; top: -18%; width: 49%; height: 145%; pointer-events: none; color: var(--color-rose-500); }
+    .ship-hologram :global(canvas) { display: block; width: 100%; height: 100%; }
+    .ship-hologram :global(.ship-scene) { width: 100%; height: 100%; }
+    .ship-hologram :global(.fallback) { position: absolute; inset: 0; display: grid; place-items: center; font-size: clamp(8rem, 22vw, 20rem); }
+    .ship-hologram :global(.ship-scene[data-ready] .fallback) { display: none; }
+    @media (max-width: 639px) {
+        .ship-hologram { position: relative; top: auto; right: auto; width: 100%; height: 270px; margin: 1rem 0 -3rem; }
+    }
+</style>

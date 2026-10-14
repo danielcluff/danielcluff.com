@@ -17,6 +17,10 @@
         "astro": "^7.3.5",
         "nosleep.js": "^0.12.0",
         "solid-js": "^1.9.14",
-        "tailwindcss": "^4.1.12"
+        "tailwindcss": "^4.1.12",
+        "three": "^0.186.1"
+    },
+    "devDependencies": {
+        "@types/three": "^0.186.0"
     }
 }
